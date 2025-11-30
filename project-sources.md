@@ -9,4 +9,6 @@
 
 | 📊 **EduNova_GanttChart** | Comprehensive Gantt chart showing task dependencies, duration, and scheduling. | [View File]https://usjreduph-my.sharepoint.com/:x:/g/personal/johnbrendan_lumicday_23_usjr_edu_ph/EVl7xd9nOhNLplTE1zO2h28BhXmay67Tj4i1YwBpQzhTeA?e=ggfgLo |
 
-| 🎨 **EduNova Figma Design** | UI/UX design prototype developed in Figma, showcasing the visual layout and flow. | [View Figma]https://www.figma.com/design/tWek9jKQ5ROl9LhCfvGiIC/Untitled?node-id=0-1&t=dkXh02EXikHaXokx-1 |
+| 🎨 **EduNova Figma Design** | UI/UX design prototype developed in Figma, showcasing the visual layout and flow. | [View Figma]https://www.figma.com/design/FsBzEqoNr2icN9d5SwH6ao/EduNova?node-id=0-1&t=JNtgbByGG6iSpPI5-1
+
+https://drive.google.com/drive/folders/14OSVpv4U_DnImUlmK_KRQGTEm_4TSAyE?usp=sharing
