@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'studentRegistration_page.dart';
+import 'teacherRegistration_page.dart';
 
 class RoleselectionPage extends StatelessWidget {
   const RoleselectionPage({Key? key}) : super(key: key);
