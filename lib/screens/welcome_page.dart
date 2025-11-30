@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'signIn_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -33,7 +34,6 @@ class WelcomePage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 60),
-
                 Container(
                   width: 200,
                   height: 200,
@@ -41,17 +41,15 @@ class WelcomePage extends StatelessWidget {
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(20),
                   ),
-
-                  child: Center(
-                    child: Icon(
-                      Icons.menu_book,
-                      size: 100,
-                      color: Theme.of(context).primaryColor,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 const SizedBox(height: 40),
-
                 const Text(
                   'Welcome to\nEduNova!',
                   style: TextStyle(
@@ -67,7 +65,6 @@ class WelcomePage extends StatelessWidget {
                   style: TextStyle(fontSize: 16, color: Color(0xFF5A6C7D)),
                 ),
                 const SizedBox(height: 60),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
