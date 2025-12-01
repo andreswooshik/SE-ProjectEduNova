@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'roleSelection_page.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -149,21 +149,11 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ForgotPasswordPage(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Color(0xFF6A4C93),
-                        fontSize: 14,
-                      ),
+                  const Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Color(0xFF6A4C93),
+                      fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 10),

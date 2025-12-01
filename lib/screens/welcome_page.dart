@@ -37,10 +37,6 @@ class WelcomePage extends StatelessWidget {
                 Container(
                   width: 200,
                   height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.asset(

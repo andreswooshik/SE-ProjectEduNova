@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'studentRegistration_page.dart';
 import 'teacherRegistration_page.dart';
 
-class RoleselectionPage extends StatelessWidget {
-  const RoleselectionPage({Key? key}) : super(key: key);
+class RoleSelectionPage extends StatelessWidget {
+  const RoleSelectionPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class RoleselectionPage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -44,7 +44,7 @@ class RoleselectionPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 50),
                 _RoleButton(
                   label: 'Student',
                   icon: Icons.person,
