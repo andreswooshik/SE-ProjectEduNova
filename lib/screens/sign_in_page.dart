@@ -32,11 +32,19 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size for responsive design
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 360;
+    final horizontalPadding = isSmallScreen ? 16.0 : 24.0;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: 16.0,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
@@ -47,21 +55,21 @@ class _SignInPageState extends State<SignInPage> {
                     children: [
                       Icon(
                         Icons.school,
-                        size: 40,
+                        size: isSmallScreen ? 32 : 40,
                         color: Theme.of(context).primaryColor,
                       ),
                       const SizedBox(width: 10),
-                      const Text(
+                      Text(
                         'EduNova',
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: isSmallScreen ? 26 : 32,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C3E50),
+                          color: const Color(0xFF2C3E50),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 48),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -77,8 +85,14 @@ class _SignInPageState extends State<SignInPage> {
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
                           hintText: 'Enter your email',
+                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -108,8 +122,15 @@ class _SignInPageState extends State<SignInPage> {
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
+                        textInputAction: TextInputAction.done,
+                        onFieldSubmitted: (_) => _signIn(),
                         decoration: InputDecoration(
                           hintText: 'Enter your password',
+                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -141,6 +162,12 @@ class _SignInPageState extends State<SignInPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _signIn,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
@@ -149,23 +176,28 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: Color(0xFF6A4C93),
-                      fontSize: 14,
+                  GestureDetector(
+                    onTap: () {
+                      // TODO: Implement forgot password
+                    },
+                    child: const Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Color(0xFF6A4C93),
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
                     children: [
                       const Text(
                         "Don't have an account? ",
                         style: TextStyle(color: Color(0xFF5A6C7D)),
                       ),
-                      TextButton(
-                        onPressed: () {
+                      GestureDetector(
+                        onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -183,6 +215,7 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),

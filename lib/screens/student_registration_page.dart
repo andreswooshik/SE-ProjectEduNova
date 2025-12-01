@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/constants/app_constants.dart';
 import '../core/validators/form_validators.dart';
+import '../models/university.dart';
 import '../providers/auth_provider.dart';
 import 'student_dashboard_page.dart';
 
@@ -18,19 +20,18 @@ class _StudentRegistrationPageState
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _schoolController = TextEditingController();
   final _schoolIdController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  University? _selectedUniversity;
 
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
-    _schoolController.dispose();
     _schoolIdController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -43,7 +44,7 @@ class _StudentRegistrationPageState
             firstName: _firstNameController.text,
             lastName: _lastNameController.text,
             email: _emailController.text,
-            school: _schoolController.text,
+            school: _selectedUniversity!.name,
             schoolId: int.parse(_schoolIdController.text),
             password: _passwordController.text,
           );
@@ -76,6 +77,10 @@ class _StudentRegistrationPageState
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    // Get screen size for responsive design
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 360;
+    final horizontalPadding = isSmallScreen ? 16.0 : 24.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -103,23 +108,26 @@ class _StudentRegistrationPageState
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: 16.0,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Center(
+                Center(
                   child: Text(
                     'Student Registration',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: isSmallScreen ? 20 : 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
+                      color: const Color(0xFF2C3E50),
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 24),
 
                 // First Name
                 _buildTextField(
@@ -127,6 +135,7 @@ class _StudentRegistrationPageState
                   label: 'First Name',
                   hint: 'Enter your first name',
                   validator: FormValidators.validateFirstName,
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 16),
 
@@ -136,25 +145,28 @@ class _StudentRegistrationPageState
                   label: 'Last Name',
                   hint: 'Enter your last name',
                   validator: FormValidators.validateLastName,
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 16),
 
-                // Email
+                // University Dropdown
+                _buildUniversityDropdown(),
+                const SizedBox(height: 16),
+
+                // Email with university domain hint
                 _buildTextField(
                   controller: _emailController,
                   label: 'Email',
-                  hint: 'Enter your email',
+                  hint: _selectedUniversity != null
+                      ? 'yourname@${_selectedUniversity!.emailDomain}'
+                      : 'Select university first',
+                  helperText: _selectedUniversity?.emailHint,
                   keyboardType: TextInputType.emailAddress,
-                  validator: FormValidators.validateEmail,
-                ),
-                const SizedBox(height: 16),
-
-                // School/University
-                _buildTextField(
-                  controller: _schoolController,
-                  label: 'School/University',
-                  hint: 'Enter your school/university',
-                  validator: FormValidators.validateSchool,
+                  validator: (value) => FormValidators.validateEmailWithUniversity(
+                    value,
+                    _selectedUniversity,
+                  ),
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 16),
 
@@ -165,6 +177,7 @@ class _StudentRegistrationPageState
                   hint: 'Enter your school ID (numbers only)',
                   keyboardType: TextInputType.number,
                   validator: FormValidators.validateSchoolId,
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 16),
 
@@ -188,6 +201,7 @@ class _StudentRegistrationPageState
                     },
                   ),
                   validator: FormValidators.validatePassword,
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 16),
 
@@ -214,6 +228,8 @@ class _StudentRegistrationPageState
                     value,
                     _passwordController.text,
                   ),
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _register(),
                 ),
                 const SizedBox(height: 30),
 
@@ -226,6 +242,9 @@ class _StudentRegistrationPageState
                       backgroundColor: const Color(0xFFFF69B4),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: authState.isLoading
                         ? const SizedBox(
@@ -246,6 +265,8 @@ class _StudentRegistrationPageState
                           ),
                   ),
                 ),
+                // Bottom padding for better scroll experience
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -254,14 +275,67 @@ class _StudentRegistrationPageState
     );
   }
 
+  Widget _buildUniversityDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'University',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF2C3E50),
+          ),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<University>(
+          initialValue: _selectedUniversity,
+          isExpanded: true,
+          decoration: InputDecoration(
+            hintText: 'Select your university',
+            hintStyle: TextStyle(color: Colors.grey[400]),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+          ),
+          items: AppConstants.universities.map((university) {
+            return DropdownMenuItem<University>(
+              value: university,
+              child: Text(
+                university.displayName,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 14),
+              ),
+            );
+          }).toList(),
+          onChanged: (University? newValue) {
+            setState(() {
+              _selectedUniversity = newValue;
+              // Clear email when university changes to force re-validation
+              if (_emailController.text.isNotEmpty) {
+                _formKey.currentState?.validate();
+              }
+            });
+          },
+          validator: FormValidators.validateUniversity,
+          menuMaxHeight: 300,
+        ),
+      ],
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
     required String hint,
+    String? helperText,
     bool obscureText = false,
     TextInputType? keyboardType,
     Widget? suffixIcon,
     String? Function(String?)? validator,
+    TextInputAction? textInputAction,
+    void Function(String)? onFieldSubmitted,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,10 +353,21 @@ class _StudentRegistrationPageState
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey[400]),
+            helperText: helperText,
+            helperStyle: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 12,
+            ),
             suffixIcon: suffixIcon,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
           ),
           validator: validator,
         ),

@@ -1,4 +1,5 @@
 import '../constants/app_constants.dart';
+import '../../models/university.dart';
 
 /// Form validators following Single Responsibility Principle
 /// This class ONLY handles form validation logic
@@ -28,7 +29,7 @@ class FormValidators {
     return null;
   }
 
-  /// Validates email field
+  /// Validates email field (basic format check)
   static String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter your email';
@@ -41,7 +42,37 @@ class FormValidators {
     return null;
   }
 
-  /// Validates school/university field
+  /// Validates email with university domain check
+  /// Returns error message if email doesn't match the university domain
+  static String? validateEmailWithUniversity(String? value, University? university) {
+    // First, validate basic email format
+    final basicValidation = validateEmail(value);
+    if (basicValidation != null) {
+      return basicValidation;
+    }
+
+    // Check if university is selected
+    if (university == null) {
+      return 'Please select a university first';
+    }
+
+    // Validate email domain matches university
+    if (!university.isValidEmailDomain(value!)) {
+      return 'Email must be from @${university.emailDomain} domain';
+    }
+
+    return null;
+  }
+
+  /// Validates university selection
+  static String? validateUniversity(University? value) {
+    if (value == null) {
+      return 'Please select your university';
+    }
+    return null;
+  }
+
+  /// Validates school/university field (legacy - kept for backwards compatibility)
   static String? validateSchool(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter your school/university';
