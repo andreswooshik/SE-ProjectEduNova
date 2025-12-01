@@ -11,4 +11,4 @@
 
 | 🎨 **EduNova Figma Design** | UI/UX design prototype developed in Figma, showcasing the visual layout and flow. | [View Figma]https://www.figma.com/design/FsBzEqoNr2icN9d5SwH6ao/EduNova?node-id=0-1&t=JNtgbByGG6iSpPI5-1
 
-https://drive.google.com/drive/folders/14OSVpv4U_DnImUlmK_KRQGTEm_4TSAyE?usp=sharing
+https://drive.google.com/drive/folders/14OSVpv4U_DnImUlmK_KRQGTEm_4TSAyE?usp=sharing 
