@@ -1,8 +1,32 @@
 import 'package:flutter/material.dart';
-import 'courseContent_page.dart';
 
-class CoursesPage extends StatelessWidget {
-  const CoursesPage({Key? key}) : super(key: key);
+class CourseContentPage extends StatefulWidget {
+  final String courseName;
+
+  const CourseContentPage({
+    Key? key,
+    required this.courseName,
+  }) : super(key: key);
+
+  @override
+  State<CourseContentPage> createState() => _CourseContentPageState();
+}
+
+class _CourseContentPageState extends State<CourseContentPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +53,7 @@ class CoursesPage extends StatelessWidget {
                   Icon(Icons.menu, color: Color(0xFF6A4C93), size: 20),
                   SizedBox(width: 8),
                   Text(
-                    'Courses',
+                    'Course Materials',
                     style: TextStyle(
                       color: Color(0xFF2C3E50),
                       fontSize: 14,
@@ -51,136 +75,133 @@ class CoursesPage extends StatelessWidget {
             onPressed: () {},
           ),
         ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Search Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  ),
-                  const Icon(Icons.mic, color: Colors.grey),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Course List
-            _CourseCard(
-              icon: Icons.school_outlined,
-              title: 'Course Title',
-              subtitle: 'Course name',
-              color: const Color(0xFF9B7EBD),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CourseContentPage(
-                      courseName: 'Course Title',
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-            _CourseCard(
-              icon: Icons.school_outlined,
-              title: 'Course Title',
-              subtitle: 'Course name',
-              color: const Color(0xFF9B7EBD),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CourseContentPage(
-                      courseName: 'Course Title',
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-            _CourseCard(
-              icon: Icons.school_outlined,
-              title: 'Course Title',
-              subtitle: 'Course name',
-              color: const Color(0xFF9B7EBD),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CourseContentPage(
-                      courseName: 'Course Title',
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-            _CourseCard(
-              icon: Icons.school_outlined,
-              title: 'Course Title',
-              subtitle: 'Course name',
-              color: const Color(0xFF9B7EBD),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CourseContentPage(
-                      courseName: 'Course Title',
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // Groups Section
-            const Text(
-              'Groups',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2C3E50),
-              ),
-            ),
-            const SizedBox(height: 16),
-            _CourseCard(
-              icon: Icons.group_outlined,
-              title: 'Group Name',
-              subtitle: 'Course name',
-              color: const Color(0xFF9B7EBD),
-              onTap: () {},
-            ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: const Color(0xFF6A4C93),
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: const Color(0xFF6A4C93),
+          tabs: const [
+            Tab(text: 'Materials'),
+            Tab(text: 'Discussions'),
+            Tab(text: 'Assignments'),
           ],
         ),
       ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // Materials Tab
+          _buildMaterialsTab(),
+          // Discussions Tab
+          _buildDiscussionsTab(),
+          // Assignments Tab
+          _buildAssignmentsTab(),
+        ],
+      ),
       bottomNavigationBar: _buildBottomNavBar(context, 0),
+    );
+  }
+
+  Widget _buildMaterialsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _ResourceCard(
+            icon: Icons.folder_outlined,
+            title: 'Learning Resources',
+            subtitle: 'Resource title',
+            color: const Color(0xFF9B7EBD),
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          _ResourceCard(
+            icon: Icons.folder_outlined,
+            title: 'Learning Resources',
+            subtitle: 'Resource title',
+            color: const Color(0xFF9B7EBD),
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          _ResourceCard(
+            icon: Icons.folder_outlined,
+            title: 'Learning Resources',
+            subtitle: 'Resource title',
+            color: const Color(0xFF9B7EBD),
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          _ResourceCard(
+            icon: Icons.folder_outlined,
+            title: 'Learning Resources',
+            subtitle: 'Resource title',
+            color: const Color(0xFF9B7EBD),
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          _ResourceCard(
+            icon: Icons.folder_outlined,
+            title: 'Learning Resources',
+            subtitle: 'Resource title',
+            color: const Color(0xFF9B7EBD),
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          _ResourceCard(
+            icon: Icons.folder_outlined,
+            title: 'Learning Resources',
+            subtitle: 'Resource title',
+            color: const Color(0xFF9B7EBD),
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDiscussionsTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(
+            Icons.forum_outlined,
+            size: 80,
+            color: Color(0xFF9B7EBD),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No discussions yet',
+            style: TextStyle(
+              fontSize: 18,
+              color: Color(0xFF5A6C7D),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAssignmentsTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(
+            Icons.assignment_outlined,
+            size: 80,
+            color: Color(0xFF9B7EBD),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No assignments yet',
+            style: TextStyle(
+              fontSize: 18,
+              color: Color(0xFF5A6C7D),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -219,7 +240,7 @@ class CoursesPage extends StatelessWidget {
         ],
         onTap: (index) {
           if (index == 0) {
-            Navigator.pop(context);
+            Navigator.popUntil(context, (route) => route.isFirst);
           }
         },
       ),
@@ -227,14 +248,14 @@ class CoursesPage extends StatelessWidget {
   }
 }
 
-class _CourseCard extends StatelessWidget {
+class _ResourceCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final Color color;
   final VoidCallback onTap;
 
-  const _CourseCard({
+  const _ResourceCard({
     Key? key,
     required this.icon,
     required this.title,
