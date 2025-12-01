@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/validators/form_validators.dart';
+import '../providers/auth_provider.dart';
+import 'student_dashboard_page.dart';
 
-class StudentRegistrationPage extends StatefulWidget {
+class StudentRegistrationPage extends ConsumerStatefulWidget {
   const StudentRegistrationPage({Key? key}) : super(key: key);
 
   @override
-  State<StudentRegistrationPage> createState() =>
+  ConsumerState<StudentRegistrationPage> createState() =>
       _StudentRegistrationPageState();
 }
 
-class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
+class _StudentRegistrationPageState
+    extends ConsumerState<StudentRegistrationPage> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -32,18 +37,46 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
     super.dispose();
   }
 
-  void _register() {
+  Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual registration logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful!')),
-      );
-      Navigator.popUntil(context, (route) => route.isFirst);
+      final success = await ref.read(authProvider.notifier).registerStudent(
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            email: _emailController.text,
+            school: _schoolController.text,
+            schoolId: int.parse(_schoolIdController.text),
+            password: _passwordController.text,
+          );
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate to student dashboard
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const StudentDashboard()),
+          (route) => false,
+        );
+      } else if (mounted) {
+        final errorMessage = ref.read(authProvider).errorMessage;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage ?? 'Registration failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -92,13 +125,8 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 _buildTextField(
                   controller: _firstNameController,
                   label: 'First Name',
-                  hint: 'First Name',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your first name';
-                    }
-                    return null;
-                  },
+                  hint: 'Enter your first name',
+                  validator: FormValidators.validateFirstName,
                 ),
                 const SizedBox(height: 16),
 
@@ -106,13 +134,8 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 _buildTextField(
                   controller: _lastNameController,
                   label: 'Last Name',
-                  hint: 'Last Name',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your last name';
-                    }
-                    return null;
-                  },
+                  hint: 'Enter your last name',
+                  validator: FormValidators.validateLastName,
                 ),
                 const SizedBox(height: 16),
 
@@ -120,17 +143,9 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 _buildTextField(
                   controller: _emailController,
                   label: 'Email',
-                  hint: 'Email',
+                  hint: 'Enter your email',
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
+                  validator: FormValidators.validateEmail,
                 ),
                 const SizedBox(height: 16),
 
@@ -138,27 +153,18 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 _buildTextField(
                   controller: _schoolController,
                   label: 'School/University',
-                  hint: 'School/University',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your school/university';
-                    }
-                    return null;
-                  },
+                  hint: 'Enter your school/university',
+                  validator: FormValidators.validateSchool,
                 ),
                 const SizedBox(height: 16),
 
-                // School ID
+                // School ID (Integer validation)
                 _buildTextField(
                   controller: _schoolIdController,
                   label: 'School ID',
-                  hint: 'School ID',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your school ID';
-                    }
-                    return null;
-                  },
+                  hint: 'Enter your school ID (numbers only)',
+                  keyboardType: TextInputType.number,
+                  validator: FormValidators.validateSchoolId,
                 ),
                 const SizedBox(height: 16),
 
@@ -166,7 +172,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 _buildTextField(
                   controller: _passwordController,
                   label: 'Password',
-                  hint: 'Password',
+                  hint: 'Enter your password',
                   obscureText: _obscurePassword,
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -181,15 +187,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                       });
                     },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
+                  validator: FormValidators.validatePassword,
                 ),
                 const SizedBox(height: 16),
 
@@ -197,7 +195,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 _buildTextField(
                   controller: _confirmPasswordController,
                   label: 'Confirm Password',
-                  hint: 'Confirm Password',
+                  hint: 'Confirm your password',
                   obscureText: _obscureConfirmPassword,
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -212,15 +210,10 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                       });
                     },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
+                  validator: (value) => FormValidators.validateConfirmPassword(
+                    value,
+                    _passwordController.text,
+                  ),
                 ),
                 const SizedBox(height: 30),
 
@@ -228,16 +221,29 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _register,
+                    onPressed: authState.isLoading ? null : _register,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF69B4),
                       foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text(
-                      'Register',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                    child: authState.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Register',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],
