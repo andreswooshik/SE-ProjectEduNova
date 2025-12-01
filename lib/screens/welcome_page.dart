@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'signIn_page.dart';
+import 'sign_in_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -34,7 +34,7 @@ class WelcomePage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 60),
-                Container(
+                SizedBox(
                   width: 200,
                   height: 200,
                   child: ClipRRect(

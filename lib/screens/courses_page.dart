@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'courseContent_page.dart';
+import 'course_content_page.dart';
 
 class CoursesPage extends StatelessWidget {
   const CoursesPage({Key? key}) : super(key: key);
@@ -24,8 +24,8 @@ class CoursesPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Icon(Icons.menu, color: Color(0xFF6A4C93), size: 20),
                   SizedBox(width: 8),
                   Text(
@@ -65,17 +65,17 @@ class CoursesPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 12),
-                  const Expanded(
+                  Icon(Icons.search, color: Colors.grey),
+                  SizedBox(width: 12),
+                  Expanded(
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'Search',
@@ -84,7 +84,7 @@ class CoursesPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Icon(Icons.mic, color: Colors.grey),
+                  Icon(Icons.mic, color: Colors.grey),
                 ],
               ),
             ),
@@ -190,7 +190,7 @@ class CoursesPage extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -254,7 +254,7 @@ class _CourseCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -265,7 +265,7 @@ class _CourseCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 24),

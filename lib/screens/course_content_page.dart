@@ -48,8 +48,8 @@ class _CourseContentPageState extends State<CourseContentPage>
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Icon(Icons.menu, color: Color(0xFF6A4C93), size: 20),
                   SizedBox(width: 8),
                   Text(
@@ -160,10 +160,10 @@ class _CourseContentPageState extends State<CourseContentPage>
   }
 
   Widget _buildDiscussionsTab() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Icon(
             Icons.forum_outlined,
             size: 80,
@@ -183,10 +183,10 @@ class _CourseContentPageState extends State<CourseContentPage>
   }
 
   Widget _buildAssignmentsTab() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Icon(
             Icons.assignment_outlined,
             size: 80,
@@ -211,7 +211,7 @@ class _CourseContentPageState extends State<CourseContentPage>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -275,7 +275,7 @@ class _ResourceCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -286,7 +286,7 @@ class _ResourceCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 24),

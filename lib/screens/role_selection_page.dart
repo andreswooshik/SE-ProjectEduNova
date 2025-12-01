@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'studentRegistration_page.dart';
-import 'teacherRegistration_page.dart';
+import 'student_registration_page.dart';
+import 'teacher_registration_page.dart';
 
 class RoleSelectionPage extends StatelessWidget {
   const RoleSelectionPage({Key? key}) : super(key: key);
@@ -99,7 +99,7 @@ class _RoleButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white.withOpacity(0.8),
+          backgroundColor: Colors.white.withValues(alpha: 0.8),
           foregroundColor: const Color(0xFF2C3E50),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),

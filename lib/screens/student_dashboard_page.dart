@@ -20,8 +20,8 @@ class StudentDashboard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Icon(Icons.menu, color: Color(0xFF6A4C93), size: 20),
                   SizedBox(width: 8),
                   Text(
@@ -103,20 +103,20 @@ class StudentDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            _DeadlineCard(
+            const _DeadlineCard(
               icon: Icons.school_outlined,
               title: 'My Progress',
               subtitle: '100% Complete',
               progress: 1.0,
-              color: const Color(0xFF9B7EBD),
+              color: Color(0xFF9B7EBD),
             ),
             const SizedBox(height: 12),
-            _DeadlineCard(
+            const _DeadlineCard(
               icon: Icons.track_changes_outlined,
               title: 'Track Learning Progress',
               subtitle: '',
               progress: 0.0,
-              color: const Color(0xFFB4A5D3),
+              color: Color(0xFFB4A5D3),
             ),
           ],
         ),
@@ -131,7 +131,7 @@ class StudentDashboard extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -191,7 +191,7 @@ class _DashboardCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -202,7 +202,7 @@ class _DashboardCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 24),
@@ -251,7 +251,7 @@ class _DeadlineCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -262,7 +262,7 @@ class _DeadlineCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 24),
