@@ -7,6 +7,9 @@ class RoleSelectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+    final logoSize = isSmallScreen ? 140.0 : 190.0;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -44,7 +47,37 @@ class RoleSelectionPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 50),
+                SizedBox(height: isSmallScreen ? 30 : 50),
+                Hero(
+                  tag: 'logoHero',
+                  child: Semantics(
+                    label: 'EduNova logo',
+                    child: SizedBox(
+                      width: logoSize,
+                      height: logoSize,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.08),
+                              child: Icon(
+                                Icons.school,
+                                size: logoSize * 0.5,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: isSmallScreen ? 30 : 50),
                 _RoleButton(
                   label: 'Student',
                   icon: Icons.person,
