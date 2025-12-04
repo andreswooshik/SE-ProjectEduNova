@@ -1,25 +1,17 @@
 import 'package:flutter/material.dart';
-import 'sign_up_page.dart';
+import 'sign_in_page.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({Key? key}) : super(key: key);
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({Key? key}) : super(key: key);
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +35,7 @@ class _SignInPageState extends State<SignInPage> {
               children: [
                 const Center(
                   child: Text(
-                    'Sign in',
+                    'Sign Up',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -54,7 +46,7 @@ class _SignInPageState extends State<SignInPage> {
                 const SizedBox(height: 8),
                 const Center(
                   child: Text(
-                    'Please Sign in with your account',
+                    'Create an account to begin your Learning Journey',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -62,18 +54,18 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
 
-                // Email
+                // Full Name
                 const Text(
-                  'Email Here',
+                  'Full Name',
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
-                  controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: '',
+                    hintText: 'Your Name Here',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -85,7 +77,30 @@ class _SignInPageState extends State<SignInPage> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
+
+                // Email
+                const Text(
+                  'Email',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Your Email Here',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 16),
 
                 // Password
                 const Text(
@@ -94,10 +109,10 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
-                  controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    hintText: '',
+                    hintText: '******************',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -110,7 +125,7 @@ class _SignInPageState extends State<SignInPage> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        color: Colors.black,
+                        color: Colors.grey,
                       ),
                       onPressed: () {
                         setState(() {
@@ -120,27 +135,50 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                 ),
-                
-                // Forget Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Forget Password?',
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                const SizedBox(height: 16),
+
+                // Confirm Password
+                const Text(
+                  'Confirm Password',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  obscureText: _obscureConfirmPassword,
+                  decoration: InputDecoration(
+                    hintText: '******************',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 32),
 
-                // Sign In Button
+                // Sign Up Button
                 SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
-                      // TODO: Implement Sign In
+                      // TODO: Implement Sign Up
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF003366), // Dark Blue
@@ -149,7 +187,7 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ),
                     child: const Text(
-                      'SIGN IN',
+                      'SIGN UP',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -160,13 +198,13 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // Or Sign in with
+                // Or Sign Up with
                 Row(
                   children: const [
                     Expanded(child: Divider(color: Colors.black)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text("Or Sign in with"),
+                      child: Text("Or Sign Up with"),
                     ),
                     Expanded(child: Divider(color: Colors.black)),
                   ],
@@ -181,7 +219,7 @@ class _SignInPageState extends State<SignInPage> {
                     onPressed: () {},
                     icon: const Icon(Icons.facebook, color: Colors.white),
                     label: const Text(
-                      'Sign In with Facebook',
+                      'Sign Up with Facebook',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -199,9 +237,9 @@ class _SignInPageState extends State<SignInPage> {
                   height: 50,
                   child: OutlinedButton.icon(
                     onPressed: () {},
-                    icon: Image.asset('assets/images/google_logo.png', height: 24, errorBuilder: (c,e,s) => const Icon(Icons.g_mobiledata, color: Colors.red)),
+                    icon: Image.asset('assets/images/google_logo.png', height: 24, errorBuilder: (c,e,s) => const Icon(Icons.g_mobiledata, color: Colors.red)), // Placeholder for Google Logo
                     label: const Text(
-                      'Sign In with Google',
+                      'Sign Up with Google',
                       style: TextStyle(color: Colors.black, fontSize: 16),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -214,23 +252,23 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // Didn't have an account
+                // Already have an account
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Didn't have an account? ",
+                      "Already have an account? ",
                       style: TextStyle(color: Colors.black),
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const SignUpPage()),
+                          MaterialPageRoute(builder: (context) => const SignInPage()),
                         );
                       },
                       child: const Text(
-                        'Sign up Here',
+                        'Sign in Here',
                         style: TextStyle(
                           color: Color(0xFF003366),
                           fontWeight: FontWeight.bold,
