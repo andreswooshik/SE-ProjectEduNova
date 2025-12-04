@@ -24,7 +24,7 @@ flutter:
 
   # Uncomment the following line to add assets
   assets:
-     - assets/images/logo.png
+     - assets/images/
 
   # Uncomment the following lines to add custom fonts
   # fonts:
