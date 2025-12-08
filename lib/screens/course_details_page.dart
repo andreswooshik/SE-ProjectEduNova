@@ -483,69 +483,116 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Student Reviews',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
         const SizedBox(height: 16),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: 3,
           itemBuilder: (context, index) {
+            List<String> reviewerNames = [
+              'Brendan Lumicday',
+              'Reiner Dela Cerna',
+              'Andres Ebuna',
+            ];
+
             return Container(
               margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Reviewer Info and Rating
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.grey.shade300,
-                        child: Text('${index + 1}'),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Student ${index + 1}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
+                      // Avatar and Name
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: Colors.grey.shade300,
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                reviewerNames[index],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
                               ),
-                            ),
-                            Row(
-                              children: [
-                                ...List.generate(5, (starIndex) {
-                                  return const Icon(Icons.star,
-                                      size: 14, color: Colors.blue);
-                                }),
-                              ],
-                            ),
-                          ],
-                        ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Student',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      // Stars
+                      Row(
+                        children: [
+                          ...List.generate(5, (starIndex) {
+                            return const Icon(
+                              Icons.star,
+                              size: 16,
+                              color: Colors.blue,
+                            );
+                          }),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
+
+                  // Review Text
                   const Text(
-                    'Great course! Very comprehensive and well explained.',
+                    'Lorem ipsum dolor sit amet consectetur. Euismod turpis tortor sollicitudin et. Quam tempor tincidunt a nunc feugiat semper tristique id.',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey,
+                      color: Colors.black87,
+                      height: 1.5,
                     ),
                   ),
                 ],
               ),
             );
           },
+        ),
+        const SizedBox(height: 24),
+
+        // Enroll Button
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF003366),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'GET ENROLL',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
       ],
     );
