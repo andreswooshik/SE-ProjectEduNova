@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'announcement_detail_page.dart';
 
 class AnnouncementsPage extends StatelessWidget {
   final String courseTitle;
@@ -83,7 +84,16 @@ class AnnouncementsPage extends StatelessWidget {
                         title: announcement['title']!,
                         date: announcement['date']!,
                         onTap: () {
-                          // Handle announcement tap
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AnnouncementDetailPage(
+                                courseTitle: courseTitle,
+                                announcementTitle: announcement['title']!,
+                                accentColor: accentColor,
+                              ),
+                            ),
+                          );
                         },
                       );
                     },
