@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'module_detail_page.dart';
 
 class ModulesPage extends StatelessWidget {
   final String courseTitle;
@@ -82,7 +83,16 @@ class ModulesPage extends StatelessWidget {
                         title: module['title']!,
                         topics: module['topics'] as List<String>,
                         onTap: () {
-                          // Handle module tap
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ModuleDetailPage(
+                                courseTitle: courseTitle,
+                                moduleTitle: module['title']!,
+                                accentColor: accentColor,
+                              ),
+                            ),
+                          );
                         },
                       );
                     },
