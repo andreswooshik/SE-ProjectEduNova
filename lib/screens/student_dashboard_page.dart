@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'course_details_page.dart';
 
 class StudentDashboardPage extends StatelessWidget {
   final String userName;
@@ -110,36 +111,42 @@ class StudentDashboardPage extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 _buildCourseCard(
+                  context,
                   'Graphic Design',
                   'By Kendrick Capusco',
                   '45%',
                   Colors.blue,
                 ),
                 _buildCourseCard(
+                  context,
                   'Wireframing',
                   'By Shoaib Atto',
                   '45%',
                   Colors.blue,
                 ),
                 _buildCourseCard(
+                  context,
                   'Website Design',
                   'By Dwayne Wade',
                   '45%',
                   Colors.orange,
                 ),
                 _buildCourseCard(
+                  context,
                   'Video Editing',
                   'By Ammer Cruz',
                   '45%',
                   Colors.black,
                 ),
                 _buildCourseCard(
+                  context,
                   'Cybersecurity',
                   'By John Anderson',
                   '45%',
                   Colors.purple,
                 ),
                 _buildCourseCard(
+                  context,
                   'MySql Basics',
                   'By Sarah Johnson',
                   '45%',
@@ -174,13 +181,25 @@ class StudentDashboardPage extends StatelessWidget {
   }
 
   Widget _buildCourseCard(
+    BuildContext context,
     String title,
     String instructor,
     String progress,
     Color accentColor,
   ) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CourseDetailsPage(
+              courseTitle: title,
+              instructor: instructor,
+              accentColor: accentColor,
+            ),
+          ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
