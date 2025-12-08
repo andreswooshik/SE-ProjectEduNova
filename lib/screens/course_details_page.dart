@@ -289,66 +289,193 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
   }
 
   Widget _buildLessonsTab() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Course Lessons',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.play_circle_outline,
-                    color: widget.accentColor,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Lesson ${index + 1}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '15 min',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.lock_outline, color: Colors.grey),
-                ],
-              ),
-            );
+    return StatefulBuilder(
+      builder: (context, setState) {
+        List<Map<String, dynamic>> chapters = [
+          {
+            'title': 'Chapter 1 : What is Graphics Designing?',
+            'isExpanded': true,
+            'lessons': [
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.description,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.description,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+            ]
           },
-        ),
-      ],
+          {
+            'title': 'Chapter 2 : What is Logo Designing?',
+            'isExpanded': false,
+            'lessons': [
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.description,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+            ]
+          },
+          {
+            'title': 'Chapter 3 : What is Poster Designing?',
+            'isExpanded': false,
+            'lessons': [
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.description,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+            ]
+          },
+          {
+            'title': 'Chapter 4 : What is Picture Editing?',
+            'isExpanded': false,
+            'lessons': [
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+            ]
+          },
+        ];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: chapters.length,
+              itemBuilder: (context, chapterIndex) {
+                return Column(
+                  children: [
+                    // Chapter Header
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          chapters[chapterIndex]['isExpanded'] =
+                              !chapters[chapterIndex]['isExpanded'];
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                chapters[chapterIndex]['title'],
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              chapters[chapterIndex]['isExpanded']
+                                  ? Icons.expand_less
+                                  : Icons.expand_more,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Lessons for this chapter
+                    if (chapters[chapterIndex]['isExpanded'])
+                      ...List.generate(
+                        chapters[chapterIndex]['lessons'].length,
+                        (lessonIndex) {
+                          var lesson =
+                              chapters[chapterIndex]['lessons'][lessonIndex];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withValues(alpha: 0.08),
+                              border: Border.all(
+                                  color: Colors.blue.withValues(alpha: 0.2)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  lesson['icon'],
+                                  color: Colors.blue,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    lesson['text'],
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+
+                    const SizedBox(height: 16),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+
+            // Enroll Button
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF003366),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'GET ENROLL',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
