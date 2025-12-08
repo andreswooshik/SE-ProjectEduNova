@@ -14,23 +14,25 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<User?> signIn(String email, String password) async {
+    await _ensureAdminExists();
     final users = await _getAllUsers();
-    final passwordHash = HashUtils.hashPassword(password);
 
     try {
       final user = users.firstWhere(
-        (u) => u.email.toLowerCase() == email.toLowerCase() && 
-               u.passwordHash == passwordHash,
+        (u) => u.email.toLowerCase() == email.toLowerCase(),
       );
 
-      // Save current user
-      await _storageService.saveString(
-        AppConstants.currentUserKey,
-        jsonEncode(user.toJson()),
-      );
-      await _storageService.saveBool(AppConstants.isLoggedInKey, true);
+      if (HashUtils.verifyPassword(password, user.passwordHash)) {
+        // Save current user
+        await _storageService.saveString(
+          AppConstants.currentUserKey,
+          jsonEncode(user.toJson()),
+        );
+        await _storageService.saveBool(AppConstants.isLoggedInKey, true);
 
-      return user;
+        return user;
+      }
+      return null;
     } catch (e) {
       return null;
     }
@@ -124,6 +126,22 @@ class AuthRepository implements IAuthRepository {
   Future<bool> emailExists(String email) async {
     final users = await _getAllUsers();
     return users.any((u) => u.email.toLowerCase() == email.toLowerCase());
+  }
+
+  /// Ensure admin account exists
+  Future<void> _ensureAdminExists() async {
+    final users = await _getAllUsers();
+    if (!users.any((u) => u.email == 'admin@edunova.ph')) {
+      final admin = Admin(
+        id: 'admin-001',
+        firstName: 'System',
+        lastName: 'Admin',
+        email: 'admin@edunova.ph',
+        school: 'EduNova',
+        passwordHash: HashUtils.hashPassword('admin123'),
+      );
+      await _saveUser(admin);
+    }
   }
 
   /// Private helper to get all users from storage

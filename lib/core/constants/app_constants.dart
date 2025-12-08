@@ -107,4 +107,5 @@ class AppConstants {
 enum UserRole {
   student,
   teacher,
+  admin,
 }
