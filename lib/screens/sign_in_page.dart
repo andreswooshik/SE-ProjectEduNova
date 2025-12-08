@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'sign_up_page.dart';
-import 'student_dashboard_page.dart';
+import 'main_navigation_page.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -149,7 +149,7 @@ class _SignInPageState extends State<SignInPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => StudentDashboardPage(
+                            builder: (context) => MainNavigationPage(
                               userName: _emailController.text.split('@')[0],
                             ),
                           ),
