@@ -174,7 +174,6 @@ class StudentDashboardPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(context, 0),
     );
   }
 
@@ -296,50 +295,6 @@ class StudentDashboardPage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildBottomNavBar(BuildContext context, int currentIndex) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      backgroundColor: Colors.white,
-      elevation: 10,
-      type: BottomNavigationBarType.fixed,
-      items: [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: Image.asset(
-            'assets/images/icon_course.png',
-            width: 24,
-            height: 24,
-            color: currentIndex == 1 ? Colors.blue : Colors.grey,
-          ),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat_bubble_outline),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: '',
-        ),
-      ],
-      onTap: (index) {
-        if (index == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MyCoursesPage(),
-            ),
-          );
-        }
-      },
     );
   }
 }
