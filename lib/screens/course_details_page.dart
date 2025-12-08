@@ -275,7 +275,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
               ),
             ),
             child: const Text(
-              'GET ENROLL',
+              'ENROLL NOW',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -464,7 +464,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                   ),
                 ),
                 child: const Text(
-                  'GET ENROLL',
+                  'ENROLL NOW',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -585,7 +585,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
               ),
             ),
             child: const Text(
-              'GET ENROLL',
+              'ENROLL NOW',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

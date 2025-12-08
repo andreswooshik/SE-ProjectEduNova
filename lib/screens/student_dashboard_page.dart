@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'course_details_page.dart';
 import 'settings_page.dart';
+import 'notifications_page.dart';
 
 class StudentDashboardPage extends StatelessWidget {
   final String userName;
@@ -37,7 +38,14 @@ class StudentDashboardPage extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsPage(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -298,13 +306,18 @@ class StudentDashboardPage extends StatelessWidget {
       backgroundColor: Colors.white,
       elevation: 10,
       type: BottomNavigationBarType.fixed,
-      items: const [
+      items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.people_outline),
+          icon: Image.asset(
+            'assets/images/icon_course.png', // Path to your image
+            width: 24,
+            height: 24,
+            color: currentIndex == 0 ? Colors.blue : Colors.grey,
+          ),
           label: '',
         ),
         BottomNavigationBarItem(
