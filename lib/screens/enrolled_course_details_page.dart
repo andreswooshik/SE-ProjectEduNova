@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'announcements_page.dart';
 
 class EnrolledCourseDetailsPage extends StatefulWidget {
   final String courseTitle;
@@ -101,7 +102,15 @@ class _EnrolledCourseDetailsPageState extends State<EnrolledCourseDetailsPage> {
                     icon: Icons.notifications_active_outlined,
                     label: 'Announcements',
                     onTap: () {
-                      // Navigate to Announcements
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AnnouncementsPage(
+                            courseTitle: widget.courseTitle,
+                            accentColor: widget.accentColor,
+                          ),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
