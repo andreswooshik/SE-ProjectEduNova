@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'announcements_page.dart';
+import 'modules_page.dart';
 
 class EnrolledCourseDetailsPage extends StatefulWidget {
   final String courseTitle;
@@ -120,7 +121,15 @@ class _EnrolledCourseDetailsPageState extends State<EnrolledCourseDetailsPage> {
                     icon: Icons.layers_outlined,
                     label: 'Modules',
                     onTap: () {
-                      // Navigate to Modules
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ModulesPage(
+                            courseTitle: widget.courseTitle,
+                            accentColor: widget.accentColor,
+                          ),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
