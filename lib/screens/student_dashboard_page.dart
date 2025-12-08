@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'course_details_page.dart';
+import 'settings_page.dart';
 
 class StudentDashboardPage extends StatelessWidget {
   final String userName;
@@ -25,7 +26,14 @@ class StudentDashboardPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsPage(userName: userName),
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
