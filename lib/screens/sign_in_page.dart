@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'sign_up_page.dart';
+import 'student_dashboard_page.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -82,7 +83,8 @@ class _SignInPageState extends State<SignInPage> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -106,10 +108,13 @@ class _SignInPageState extends State<SignInPage> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
                         color: Colors.black,
                       ),
                       onPressed: () {
@@ -120,7 +125,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                 ),
-                
+
                 // Forget Password
                 Align(
                   alignment: Alignment.centerRight,
@@ -140,7 +145,16 @@ class _SignInPageState extends State<SignInPage> {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
-                      // TODO: Implement Sign In
+                      if (_formKey.currentState!.validate()) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StudentDashboardPage(
+                              userName: _emailController.text.split('@')[0],
+                            ),
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF003366), // Dark Blue
@@ -199,7 +213,10 @@ class _SignInPageState extends State<SignInPage> {
                   height: 50,
                   child: OutlinedButton.icon(
                     onPressed: () {},
-                    icon: Image.asset('assets/images/google_logo.png', height: 24, errorBuilder: (c,e,s) => const Icon(Icons.g_mobiledata, color: Colors.red)),
+                    icon: Image.asset('assets/images/google_logo.png',
+                        height: 24,
+                        errorBuilder: (c, e, s) =>
+                            const Icon(Icons.g_mobiledata, color: Colors.red)),
                     label: const Text(
                       'Sign In with Google',
                       style: TextStyle(color: Colors.black, fontSize: 16),
@@ -226,7 +243,8 @@ class _SignInPageState extends State<SignInPage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const SignUpPage()),
+                          MaterialPageRoute(
+                              builder: (context) => const SignUpPage()),
                         );
                       },
                       child: const Text(
