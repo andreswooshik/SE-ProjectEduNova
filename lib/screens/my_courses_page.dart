@@ -14,11 +14,16 @@ class MyCoursesPage extends StatefulWidget {
     required String instructor,
     required Color accentColor,
   }) {
-    enrolledCourses.add({
-      'title': title,
-      'instructor': instructor,
-      'accentColor': accentColor,
-    });
+    bool courseExists =
+        enrolledCourses.any((course) => course['title'] == title);
+
+    if (!courseExists) {
+      enrolledCourses.add({
+        'title': title,
+        'instructor': instructor,
+        'accentColor': accentColor,
+      });
+    }
   }
 }
 

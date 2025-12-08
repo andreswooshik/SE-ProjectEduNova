@@ -138,7 +138,7 @@ class StudentDashboardPage extends StatelessWidget {
                   'Wireframing',
                   'By Shoaib Atto',
                   '45%',
-                  Colors.blue,
+                  const Color.fromARGB(255, 180, 41, 134),
                 ),
                 _buildCourseCard(
                   context,
@@ -168,6 +168,13 @@ class StudentDashboardPage extends StatelessWidget {
                   '45%',
                   Colors.green,
                 ),
+                _buildCourseCard(
+                  context,
+                  'Flutter Development',
+                  'By Adhz Formentera',
+                  '45%',
+                  Colors.blue,
+                )
               ],
             ),
           ],

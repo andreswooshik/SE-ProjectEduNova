@@ -269,29 +269,36 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
           height: 56,
           child: ElevatedButton(
             onPressed: () {
-              MyCoursesPage.addEnrolledCourse(
-                title: widget.courseTitle,
-                instructor: widget.instructor,
-                accentColor: widget.accentColor,
-              );
+              bool isAlreadyEnrolled = MyCoursesPage.enrolledCourses
+                  .any((course) => course['title'] == widget.courseTitle);
+              if (isAlreadyEnrolled) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Already enrolled in this course!'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+              } else {
+                // Add course to enrolled courses
+                MyCoursesPage.addEnrolledCourse(
+                  title: widget.courseTitle,
+                  instructor: widget.instructor,
+                  accentColor: widget.accentColor,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Successfully enrolled in the course!'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.green,
+                  ),
+                );
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Enrolled successfully!'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-
-              Future.delayed(const Duration(seconds: 1), () {
-                Navigator.pop(context);
-              });
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF003366),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
             child: const Text(
               'ENROLL NOW',
               style: TextStyle(

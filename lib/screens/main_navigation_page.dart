@@ -2,7 +2,6 @@ import 'package:edunova_app/screens/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'student_dashboard_page.dart';
 import 'my_courses_page.dart';
-import 'profile_page.dart';
 import 'messages_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
