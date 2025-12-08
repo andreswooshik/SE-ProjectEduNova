@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
 import 'sign_up_page.dart';
 import 'main_navigation_page.dart';
 
-class SignInPage extends StatefulWidget {
+class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  ConsumerState<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends ConsumerState<SignInPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -73,6 +75,12 @@ class _SignInPageState extends State<SignInPage> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     hintText: '',
                     border: OutlineInputBorder(
@@ -97,6 +105,12 @@ class _SignInPageState extends State<SignInPage> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _passwordController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: '',
@@ -144,16 +158,30 @@ class _SignInPageState extends State<SignInPage> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MainNavigationPage(
-                              userName: _emailController.text.split('@')[0],
+                        final success = await ref
+                            .read(authProvider.notifier)
+                            .signIn(_emailController.text, _passwordController.text);
+
+                        if (success && mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainNavigationPage(
+                                userName: _emailController.text.split('@')[0],
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        } else if (mounted) {
+                          final error = ref.read(authProvider).errorMessage;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(error ?? 'Invalid email or password'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(

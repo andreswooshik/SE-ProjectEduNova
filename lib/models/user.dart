@@ -42,8 +42,10 @@ abstract class User {
 
     if (role == UserRole.student) {
       return Student.fromJson(json);
-    } else {
+    } else if (role == UserRole.teacher) {
       return Teacher.fromJson(json);
+    } else {
+      return Admin.fromJson(json);
     }
   }
 
@@ -192,6 +194,49 @@ class Teacher extends User {
       passwordHash: passwordHash ?? this.passwordHash,
       employeeId: employeeId ?? this.employeeId,
       createdAt: createdAt ?? this.createdAt,
+    );
+  }
+}
+
+/// Admin class extending User
+class Admin extends User {
+  Admin({
+    required super.id,
+    required super.firstName,
+    required super.lastName,
+    required super.email,
+    required super.passwordHash,
+    super.createdAt,
+  }) : super(
+          school: 'EduNova Administration',
+          role: UserRole.admin,
+        );
+
+  @override
+  int get institutionId => 0;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'school': school,
+      'passwordHash': passwordHash,
+      'role': role.name,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory Admin.fromJson(Map<String, dynamic> json) {
+    return Admin(
+      id: json['id'] as String,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String,
+      email: json['email'] as String,
+      passwordHash: json['passwordHash'] as String,
+      createdAt: DateTime.tryParse(json['createdAt'] ?? ''),
     );
   }
 }

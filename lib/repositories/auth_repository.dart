@@ -14,23 +14,46 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<User?> signIn(String email, String password) async {
+    if (email.isEmpty || password.isEmpty) return null;
+
+    // Admin Account Check
+    if (email == 'admin@edunova.ph' && password == 'admin123') {
+      final admin = Admin(
+        id: 'admin-001',
+        firstName: 'System',
+        lastName: 'Admin',
+        email: email,
+        passwordHash: HashUtils.hashPassword(password),
+      );
+      
+      // Save admin session
+      await _storageService.saveString(
+        AppConstants.currentUserKey,
+        jsonEncode(admin.toJson()),
+      );
+      await _storageService.saveBool(AppConstants.isLoggedInKey, true);
+      
+      return admin;
+    }
+
     final users = await _getAllUsers();
-    final passwordHash = HashUtils.hashPassword(password);
 
     try {
       final user = users.firstWhere(
-        (u) => u.email.toLowerCase() == email.toLowerCase() && 
-               u.passwordHash == passwordHash,
+        (u) => u.email.toLowerCase() == email.toLowerCase(),
       );
 
-      // Save current user
-      await _storageService.saveString(
-        AppConstants.currentUserKey,
-        jsonEncode(user.toJson()),
-      );
-      await _storageService.saveBool(AppConstants.isLoggedInKey, true);
+      if (HashUtils.verifyPassword(password, user.passwordHash)) {
+        // Save current user
+        await _storageService.saveString(
+          AppConstants.currentUserKey,
+          jsonEncode(user.toJson()),
+        );
+        await _storageService.saveBool(AppConstants.isLoggedInKey, true);
 
-      return user;
+        return user;
+      }
+      return null;
     } catch (e) {
       return null;
     }
