@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'course_details_page.dart';
 import 'settings_page.dart';
 import 'notifications_page.dart';
-import 'my_courses_page.dart';
 
 class StudentDashboardPage extends StatelessWidget {
   final String userName;
