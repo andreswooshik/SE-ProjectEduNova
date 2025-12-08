@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'enrolled_course_details_page.dart';
 
 class MyCoursesPage extends StatefulWidget {
   const MyCoursesPage({Key? key}) : super(key: key);
@@ -92,18 +93,19 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
                       MyCoursesPage.enrolledCourses.length,
                       (index) {
                         var course = MyCoursesPage.enrolledCourses[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EnrolledCourseDetailsPage(
+                                  courseTitle: course['title'],
+                                  instructor: course['instructor'],
+                                  accentColor: course['accentColor'],
+                                ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
