@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'sign_in_page.dart';
+import 'notifications_page.dart';
 
 class SettingsPage extends StatelessWidget {
   final String userName;
@@ -32,7 +33,14 @@ class SettingsPage extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsPage(),
+                ),
+              );
+            },
           ),
         ],
       ),

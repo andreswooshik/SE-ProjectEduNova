@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'settings_page.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -25,7 +26,14 @@ class NotificationsPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsPage(userName: ''),
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
