@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'course_details_page.dart';
 import 'settings_page.dart';
 import 'notifications_page.dart';
+import 'my_courses_page.dart';
 
 class StudentDashboardPage extends StatelessWidget {
   final String userName;
@@ -313,10 +314,10 @@ class StudentDashboardPage extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Image.asset(
-            'assets/images/icon_course.png', // Path to your image
+            'assets/images/icon_course.png',
             width: 24,
             height: 24,
-            color: currentIndex == 0 ? Colors.blue : Colors.grey,
+            color: currentIndex == 1 ? Colors.blue : Colors.grey,
           ),
           label: '',
         ),
@@ -329,7 +330,16 @@ class StudentDashboardPage extends StatelessWidget {
           label: '',
         ),
       ],
-      onTap: (index) {},
+      onTap: (index) {
+        if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MyCoursesPage(),
+            ),
+          );
+        }
+      },
     );
   }
 }

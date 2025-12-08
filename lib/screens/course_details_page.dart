@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'my_courses_page.dart';
 
 class CourseDetailsPage extends StatefulWidget {
   final String courseTitle;
@@ -157,7 +158,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
           ),
         ),
         const SizedBox(height: 12),
-        Text(
+        const Text(
           'Read More',
           style: TextStyle(
             fontSize: 14,
@@ -267,7 +268,24 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
           width: double.infinity,
           height: 56,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              MyCoursesPage.addEnrolledCourse(
+                title: widget.courseTitle,
+                instructor: widget.instructor,
+                accentColor: widget.accentColor,
+              );
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Enrolled successfully!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+
+              Future.delayed(const Duration(seconds: 1), () {
+                Navigator.pop(context);
+              });
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF003366),
               shape: RoundedRectangleBorder(
