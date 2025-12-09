@@ -4,23 +4,28 @@ class StringFormatUtils {
   // Private constructor to prevent instantiation
   StringFormatUtils._();
 
-  /// Formats field name for error messages with proper article
+  /// Formats field name for error messages
+  /// Converts camelCase or snake_case to readable format
   /// 
   /// Examples:
-  /// - "username" -> "a username"
-  /// - "email" -> "an email"
-  /// - "your name" -> "your name" (already has article)
+  /// - "username" -> "username"
+  /// - "email" -> "email"
+  /// - "firstName" -> "first name"
+  /// - "email_address" -> "email address"
   static String formatFieldName(String fieldName) {
-    final lowercase = fieldName.toLowerCase();
-    
-    // Check if already has article or possessive
-    final needsArticle = !lowercase.startsWith(RegExp(r'^(the|your|a |an )'));
-    
-    if (!needsArticle) return lowercase;
-    
-    // Use 'an' for vowel sounds, 'a' for consonants
-    final startsWithVowel = RegExp(r'^[aeiou]', caseSensitive: false).hasMatch(lowercase);
-    return startsWithVowel ? 'an $lowercase' : 'a $lowercase';
+    if (fieldName.isEmpty) return fieldName;
+
+    // Replace underscores with spaces
+    String formatted = fieldName.replaceAll('_', ' ');
+
+    // Insert spaces before capital letters (camelCase)
+    formatted = formatted.replaceAllMapped(
+      RegExp(r'([a-z])([A-Z])'),
+      (match) => '${match.group(1)} ${match.group(2)}',
+    );
+
+    // Convert to lowercase
+    return formatted.toLowerCase();
   }
 
   /// Capitalizes the first letter of a string
