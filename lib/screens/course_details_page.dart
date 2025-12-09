@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/courses_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/course.dart';
-import 'my_courses_page.dart';
 
 class CourseDetailsPage extends ConsumerStatefulWidget {
   final String courseTitle;

@@ -1,13 +1,18 @@
 import '../models/course.dart';
 import '../services/interfaces/i_course_storage_service.dart';
 import 'interfaces/i_course_repository.dart';
+import 'interfaces/i_module_repository.dart';
 
 /// Concrete implementation of ICourseRepository
 /// Open/Closed Principle: Can be extended or replaced without modifying clients
 class CourseRepository implements ICourseRepository {
   final ICourseStorageService _courseStorageService;
+  final IModuleRepository? _moduleRepository;
 
-  CourseRepository(this._courseStorageService);
+  CourseRepository(
+    this._courseStorageService, {
+    IModuleRepository? moduleRepository,
+  }) : _moduleRepository = moduleRepository;
 
   @override
   Future<List<Course>> getAllCourses() async {
@@ -66,6 +71,16 @@ class CourseRepository implements ICourseRepository {
     
     if (courses.length == initialLength) {
       return false;
+    }
+
+    // Cascade delete: Delete all modules associated with this course
+    if (_moduleRepository != null) {
+      try {
+        await _moduleRepository!.deleteModulesByCourseId(courseId);
+      } catch (e) {
+        // Log error but continue with course deletion
+        print('Warning: Failed to delete modules for course $courseId: $e');
+      }
     }
 
     await _courseStorageService.saveCourses(courses);
