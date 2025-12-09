@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
+import '../models/course.dart';
 import '../screens/course_details_page.dart';
 
 class CourseCard extends StatelessWidget {
-  final String title;
-  final String instructor;
-  final String progress;
-  final Color accentColor;
-  final String? assetImage;
-  final String? imageUrl;
+  final Course course;
   final VoidCallback? onTap;
 
   const CourseCard({
     Key? key,
-    required this.title,
-    required this.instructor,
-    required this.progress,
-    required this.accentColor,
-    this.assetImage,
-    this.imageUrl,
+    required this.course,
     this.onTap,
   }) : super(key: key);
 
@@ -30,9 +21,7 @@ class CourseCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => CourseDetailsPage(
-                  courseTitle: title,
-                  instructor: instructor,
-                  accentColor: accentColor,
+                  course: course,
                 ),
               ),
             );
@@ -66,7 +55,7 @@ class CourseCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    course.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -77,7 +66,7 @@ class CourseCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    instructor,
+                    course.instructor ?? 'Unknown Instructor',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -94,7 +83,7 @@ class CourseCard extends StatelessWidget {
                       }),
                       const SizedBox(width: 8),
                       Text(
-                        progress,
+                        course.progress ?? '0%',
                         style: const TextStyle(
                           fontSize: 10,
                           color: Colors.grey,
@@ -109,7 +98,8 @@ class CourseCard extends StatelessWidget {
                       value: _getProgressValue(),
                       minHeight: 4,
                       backgroundColor: Colors.grey.shade300,
-                      valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          course.accentColor ?? Colors.blue),
                     ),
                   ),
                 ],
@@ -123,9 +113,9 @@ class CourseCard extends StatelessWidget {
 
   Widget _buildImage() {
     // Priority: assetImage > imageUrl > fallback
-    if (assetImage != null) {
+    if (course.thumbnailAsset != null) {
       return Image.asset(
-        assetImage!,
+        course.thumbnailAsset!,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,
@@ -133,9 +123,9 @@ class CourseCard extends StatelessWidget {
       );
     }
 
-    if (imageUrl != null) {
+    if (course.thumbnailUrl != null) {
       return Image.network(
-        imageUrl!,
+        course.thumbnailUrl!,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,
@@ -151,6 +141,7 @@ class CourseCard extends StatelessWidget {
   }
 
   Widget _buildFallback() {
+    final accentColor = course.accentColor ?? Colors.blue;
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -168,6 +159,7 @@ class CourseCard extends StatelessWidget {
   }
 
   Widget _buildLoadingIndicator() {
+    final accentColor = course.accentColor ?? Colors.blue;
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -182,7 +174,7 @@ class CourseCard extends StatelessWidget {
   }
 
   double _getProgressValue() {
-    // Parse progress string (e.g., "45%" to 0.45)
+    final progress = course.progress ?? '0%';
     final progressValue = double.tryParse(progress.replaceAll('%', '')) ?? 0;
     return progressValue / 100;
   }

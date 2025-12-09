@@ -1,32 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/courses_provider.dart';
+import '../providers/enrollment_provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/course_card.dart';
 
-class MyCoursesPage extends ConsumerStatefulWidget {
+class MyCoursesPage extends ConsumerWidget {
   const MyCoursesPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<MyCoursesPage> createState() => _MyCoursesPageState();
-}
-
-class _MyCoursesPageState extends ConsumerState<MyCoursesPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final user = ref.read(authProvider).user;
-      if (user != null) {
-        ref.read(coursesProvider.notifier).loadCoursesForStudent(user.id);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final coursesState = ref.watch(coursesProvider);
-    final myCourses = coursesState.myCourses;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enrolledCourses = ref.watch(enrollmentProvider);
+    final user = ref.watch(authProvider).user;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -46,60 +30,86 @@ class _MyCoursesPageState extends ConsumerState<MyCoursesPage> {
           ),
         ),
       ),
-      body: coursesState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : myCourses.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.school_outlined,
-                        size: 80,
-                        color: Colors.grey.shade300,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No Courses Yet',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Enroll in a course to get started',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade500,
-                        ),
-                      ),
-                    ],
+      body: enrolledCourses.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.school_outlined,
+                    size: 80,
+                    color: Colors.grey.shade300,
                   ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: GridView.builder(
+                  const SizedBox(height: 16),
+                  Text(
+                    'No Courses Yet',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Enroll in a course to get started',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.explore),
+                    label: const Text('Browse Courses'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF003366),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Enrolled Courses (${enrolledCourses.length})',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
+                      childAspectRatio: 0.75,
                     ),
-                    itemCount: myCourses.length,
+                    itemCount: enrolledCourses.length,
                     itemBuilder: (context, index) {
-                      final course = myCourses[index];
-                      return CourseCard(
-                        title: course.title,
-                        instructor: 'Instructor', // Placeholder
-                        progress: '0%', // Placeholder
-                        accentColor: Colors.blue, // Placeholder
-                      );
+                      final course = enrolledCourses[index];
+                      return CourseCard(course: course);
                     },
                   ),
-                ),
+                ],
+              ),
+            ),
     );
   }
 }
