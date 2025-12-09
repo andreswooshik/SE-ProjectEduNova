@@ -1,11 +1,18 @@
 import '../constants/app_constants.dart';
 import '../../models/university.dart';
+import '../utils/string_format_utils.dart';
 
 /// Form validators following Single Responsibility Principle
 /// This class ONLY handles form validation logic
 class FormValidators {
   // Private constructor to prevent instantiation
   FormValidators._();
+
+  // Static final regex for performance
+  static final RegExp _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  static final RegExp _urlRegex = RegExp(
+    r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
+  );
 
   /// Validates first name field
   static String? validateFirstName(String? value) {
@@ -34,9 +41,8 @@ class FormValidators {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter your email';
     }
-    // Basic email regex pattern
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value.trim())) {
+    // Use static regex for better performance
+    if (!_emailRegex.hasMatch(value.trim())) {
       return 'Please enter a valid email address';
     }
     return null;
@@ -110,15 +116,45 @@ class FormValidators {
     return null;
   }
 
-  /// Validates password field
-  static String? validatePassword(String? value) {
+  /// Validates password field with enhanced security
+  /// 
+  /// Enforces strong password requirements:
+  /// - Minimum length requirement
+  /// - At least one letter (optional)
+  /// - At least one number (optional)
+  /// 
+  /// For basic validation without complexity requirements, use [validatePasswordBasic].
+  /// 
+  /// Note: Default is `enforceComplexity = false` for backward compatibility.
+  /// For new implementations, consider using `enforceComplexity: true`.
+  static String? validatePassword(String? value, {bool enforceComplexity = false}) {
     if (value == null || value.isEmpty) {
       return 'Please enter a password';
     }
     if (value.length < AppConstants.minPasswordLength) {
       return 'Password must be at least ${AppConstants.minPasswordLength} characters';
     }
+    
+    if (enforceComplexity) {
+      // Check for at least one letter
+      if (!RegExp(r'[a-zA-Z]').hasMatch(value)) {
+        return 'Password must contain at least one letter';
+      }
+      // Check for at least one number
+      if (!RegExp(r'[0-9]').hasMatch(value)) {
+        return 'Password must contain at least one number';
+      }
+    }
+    
     return null;
+  }
+
+  /// Validates password field with basic requirement (for backward compatibility)
+  /// 
+  /// Only checks for minimum length. For enhanced security validation,
+  /// use [validatePassword] with enforceComplexity parameter.
+  static String? validatePasswordBasic(String? value) {
+    return validatePassword(value, enforceComplexity: false);
   }
 
   /// Validates confirm password field
@@ -129,6 +165,105 @@ class FormValidators {
     if (value != password) {
       return 'Passwords do not match';
     }
+    return null;
+  }
+
+  /// Validates module title
+  static String? validateModuleTitle(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a module title';
+    }
+    if (value.trim().length < 3) {
+      return 'Title must be at least 3 characters';
+    }
+    if (value.trim().length > 100) {
+      return 'Title must not exceed 100 characters';
+    }
+    return null;
+  }
+
+  /// Validates description fields
+  static String? validateDescription(String? value, {bool required = false}) {
+    if (required && (value == null || value.trim().isEmpty)) {
+      return 'Please enter a description';
+    }
+    if (value != null && value.trim().length > 500) {
+      return 'Description must not exceed 500 characters';
+    }
+    return null;
+  }
+
+  /// Validates course title
+  static String? validateCourseTitle(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a course title';
+    }
+    if (value.trim().length < 3) {
+      return 'Title must be at least 3 characters';
+    }
+    if (value.trim().length > 100) {
+      return 'Title must not exceed 100 characters';
+    }
+    return null;
+  }
+
+  /// Validates general text input
+  /// 
+  /// A flexible validator for various text input fields with customizable constraints.
+  /// 
+  /// Parameters:
+  /// - [value]: The text to validate
+  /// - [fieldName]: Human-readable field name for error messages (e.g., 'username', 'title')
+  /// - [minLength]: Minimum required length (optional)
+  /// - [maxLength]: Maximum allowed length (optional)
+  /// - [required]: Whether the field is required (default: true)
+  /// 
+  /// Returns: Error message or null if valid
+  /// 
+  /// Example:
+  /// ```dart
+  /// validateTextField('John', fieldName: 'username', minLength: 3, maxLength: 20)
+  /// ```
+  static String? validateTextField(String? value, {
+    required String fieldName,
+    int? minLength,
+    int? maxLength,
+    bool required = true,
+  }) {
+    // Use shared utility for formatting (DRY principle)
+    final formattedFieldName = StringFormatUtils.formatFieldName(fieldName);
+    
+    if (required && (value == null || value.trim().isEmpty)) {
+      return 'Please enter $formattedFieldName';
+    }
+    
+    if (value != null && value.trim().isNotEmpty) {
+      if (minLength != null && value.trim().length < minLength) {
+        return '${StringFormatUtils.capitalizeFirst(formattedFieldName)} must be at least $minLength characters';
+      }
+      if (maxLength != null && value.trim().length > maxLength) {
+        return '${StringFormatUtils.capitalizeFirst(formattedFieldName)} must not exceed $maxLength characters';
+      }
+    }
+    
+    return null;
+  }
+
+  /// Validates URL format
+  static String? validateUrl(String? value, {bool required = false}) {
+    if (!required && (value == null || value.trim().isEmpty)) {
+      return null;
+    }
+    
+    if (required && (value == null || value.trim().isEmpty)) {
+      return 'Please enter a URL';
+    }
+    
+    // Use static regex for better performance
+    if (!_urlRegex.hasMatch(value!.trim())) {
+      return 'Please enter a valid URL (must start with http:// or https://)';
+    }
+    
     return null;
   }
 }

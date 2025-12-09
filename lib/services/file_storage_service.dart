@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import '../models/module.dart';
@@ -175,7 +176,7 @@ class FileStorageService implements IFileStorageService {
               deletedCount++;
             } catch (e) {
               // Continue even if deletion fails
-              print('Failed to delete orphaned file ${entity.path}: $e');
+              debugPrint('Failed to delete orphaned file ${entity.path}: $e');
             }
           }
         }

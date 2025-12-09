@@ -1,16 +1,17 @@
-/// Utility class for string formatting operations
-/// Single Responsibility Principle: Only handles string formatting
+/// String formatting utilities
+/// Single Responsibility Principle: Only handles string formatting operations
 class StringFormatUtils {
-  /// Private constructor to prevent instantiation
+  // Private constructor to prevent instantiation
   StringFormatUtils._();
 
-  /// Formats a field name for display in error messages
+  /// Formats field name for error messages
   /// Converts camelCase or snake_case to readable format
   /// 
-  /// Example:
-  /// - 'firstName' -> 'first name'
-  /// - 'email_address' -> 'email address'
-  /// - 'password' -> 'password'
+  /// Examples:
+  /// - "username" -> "username"
+  /// - "email" -> "email"
+  /// - "firstName" -> "first name"
+  /// - "email_address" -> "email address"
   static String formatFieldName(String fieldName) {
     if (fieldName.isEmpty) return fieldName;
 
@@ -27,21 +28,17 @@ class StringFormatUtils {
     return formatted.toLowerCase();
   }
 
-  /// Capitalizes the first character of a string
+  /// Capitalizes the first letter of a string
   /// 
-  /// Example:
-  /// - 'hello' -> 'Hello'
-  /// - 'first name' -> 'First name'
+  /// Example: "hello world" -> "Hello world"
   static String capitalizeFirst(String text) {
     if (text.isEmpty) return text;
     return text[0].toUpperCase() + text.substring(1);
   }
 
-  /// Converts a string to title case (capitalizes first letter of each word)
+  /// Converts a string to title case
   /// 
-  /// Example:
-  /// - 'hello world' -> 'Hello World'
-  /// - 'first name' -> 'First Name'
+  /// Example: "hello world" -> "Hello World"
   static String toTitleCase(String text) {
     if (text.isEmpty) return text;
     
@@ -49,5 +46,29 @@ class StringFormatUtils {
       if (word.isEmpty) return word;
       return word[0].toUpperCase() + word.substring(1).toLowerCase();
     }).join(' ');
+  }
+
+  /// Converts camelCase or PascalCase to human-readable format
+  /// 
+  /// Example: "firstName" -> "first name"
+  static String camelCaseToWords(String text) {
+    if (text.isEmpty) return text;
+    
+    return text.replaceAllMapped(
+      RegExp(r'([A-Z])'),
+      (match) => ' ${match.group(0)!.toLowerCase()}',
+    ).trim();
+  }
+
+  /// Truncates text to specified length with ellipsis
+  /// 
+  /// Example: truncate("Hello World", 8) -> "Hello..."
+  static String truncate(String text, int maxLength, {String ellipsis = '...'}) {
+    if (text.length <= maxLength) return text;
+    
+    final cutOff = maxLength - ellipsis.length;
+    if (cutOff <= 0) return ellipsis;
+    
+    return text.substring(0, cutOff) + ellipsis;
   }
 }
