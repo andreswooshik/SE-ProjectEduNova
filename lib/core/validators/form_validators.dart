@@ -1,11 +1,18 @@
 import '../constants/app_constants.dart';
 import '../../models/university.dart';
+import '../utils/string_format_utils.dart';
 
 /// Form validators following Single Responsibility Principle
 /// This class ONLY handles form validation logic
 class FormValidators {
   // Private constructor to prevent instantiation
   FormValidators._();
+
+  // Static final regex for performance
+  static final RegExp _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  static final RegExp _urlRegex = RegExp(
+    r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
+  );
 
   /// Validates first name field
   static String? validateFirstName(String? value) {
@@ -34,9 +41,8 @@ class FormValidators {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter your email';
     }
-    // Basic email regex pattern
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value.trim())) {
+    // Use static regex for better performance
+    if (!_emailRegex.hasMatch(value.trim())) {
       return 'Please enter a valid email address';
     }
     return null;
@@ -221,8 +227,8 @@ class FormValidators {
     int? maxLength,
     bool required = true,
   }) {
-    // Properly format field name for error messages
-    final formattedFieldName = _formatFieldName(fieldName);
+    // Use shared utility for formatting (DRY principle)
+    final formattedFieldName = StringFormatUtils.formatFieldName(fieldName);
     
     if (required && (value == null || value.trim().isEmpty)) {
       return 'Please enter $formattedFieldName';
@@ -230,34 +236,16 @@ class FormValidators {
     
     if (value != null && value.trim().isNotEmpty) {
       if (minLength != null && value.trim().length < minLength) {
-        return '${_capitalizeFirst(formattedFieldName)} must be at least $minLength characters';
+        return '${StringFormatUtils.capitalizeFirst(formattedFieldName)} must be at least $minLength characters';
       }
       if (maxLength != null && value.trim().length > maxLength) {
-        return '${_capitalizeFirst(formattedFieldName)} must not exceed $maxLength characters';
+        return '${StringFormatUtils.capitalizeFirst(formattedFieldName)} must not exceed $maxLength characters';
       }
     }
     
     return null;
   }
-
-  /// Formats field name for error messages with proper article
-  static String _formatFieldName(String fieldName) {
-    final lowercase = fieldName.toLowerCase();
-    // Check if needs article 'a' or 'an'
-    final needsArticle = !lowercase.startsWith(RegExp(r'^(the|your|a |an )'));
-    
-    if (!needsArticle) return lowercase;
-    
-    // Use 'an' for vowel sounds, 'a' for consonants
-    final startsWithVowel = RegExp(r'^[aeiou]', caseSensitive: false).hasMatch(lowercase);
-    return startsWithVowel ? 'an $lowercase' : 'a $lowercase';
-  }
-
-  /// Capitalizes the first letter of a string
-  static String _capitalizeFirst(String text) {
-    if (text.isEmpty) return text;
-    return text[0].toUpperCase() + text.substring(1);
-  }
+}
 
   /// Validates URL format
   static String? validateUrl(String? value, {bool required = false}) {
@@ -269,11 +257,8 @@ class FormValidators {
       return 'Please enter a URL';
     }
     
-    final urlRegex = RegExp(
-      r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
-    );
-    
-    if (!urlRegex.hasMatch(value!.trim())) {
+    // Use static regex for better performance
+    if (!_urlRegex.hasMatch(value!.trim())) {
       return 'Please enter a valid URL (must start with http:// or https://)';
     }
     

@@ -1,3 +1,5 @@
+import '../utils/string_format_utils.dart';
+
 /// Interface for field validators
 /// Interface Segregation Principle: Specific interface for validation
 abstract class IFieldValidator {
@@ -169,42 +171,28 @@ class LengthValidator extends BaseValidator {
 
   @override
   String? validate(String? value) {
-    final formattedName = _formatFieldName(fieldName);
+    // Use shared utility (DRY principle)
+    final formattedName = StringFormatUtils.formatFieldName(fieldName);
 
     if (required && isEmpty(value)) {
       return 'Please enter $formattedName';
     }
 
     if (!isEmpty(value)) {
-      final trimmed = getTrimmed(value)!;
-      
-      if (minLength != null && trimmed.length < minLength!) {
-        return '${_capitalizeFirst(formattedName)} must be at least $minLength characters';
-      }
-      
-      if (maxLength != null && trimmed.length > maxLength!) {
-        return '${_capitalizeFirst(formattedName)} must not exceed $maxLength characters';
+      final trimmed = getTrimmed(value);
+      // Safe null check before using value
+      if (trimmed != null) {
+        if (minLength != null && trimmed.length < minLength!) {
+          return '${StringFormatUtils.capitalizeFirst(formattedName)} must be at least $minLength characters';
+        }
+        
+        if (maxLength != null && trimmed.length > maxLength!) {
+          return '${StringFormatUtils.capitalizeFirst(formattedName)} must not exceed $maxLength characters';
+        }
       }
     }
 
     return null;
-  }
-
-  /// Formats field name for error messages with proper article
-  String _formatFieldName(String fieldName) {
-    final lowercase = fieldName.toLowerCase();
-    final needsArticle = !lowercase.startsWith(RegExp(r'^(the|your|a |an )'));
-    
-    if (!needsArticle) return lowercase;
-    
-    final startsWithVowel = RegExp(r'^[aeiou]', caseSensitive: false).hasMatch(lowercase);
-    return startsWithVowel ? 'an $lowercase' : 'a $lowercase';
-  }
-
-  /// Capitalizes the first letter of a string
-  String _capitalizeFirst(String text) {
-    if (text.isEmpty) return text;
-    return text[0].toUpperCase() + text.substring(1);
   }
 }
 

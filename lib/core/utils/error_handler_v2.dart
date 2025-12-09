@@ -103,6 +103,15 @@ class ErrorHandler {
   final IErrorLogger _logger;
   final IErrorMessageProvider _messageProvider;
 
+  // Singleton instance
+  static ErrorHandler? _instance;
+
+  /// Get singleton instance
+  static ErrorHandler get instance {
+    _instance ??= ErrorHandler();
+    return _instance!;
+  }
+
   /// Constructor with dependency injection
   /// Dependency Inversion Principle: Depends on abstractions
   ErrorHandler({
@@ -152,34 +161,28 @@ class ErrorHandler {
   }
 }
 
-/// Singleton instance for convenience
-/// Note: For better testability, use dependency injection instead
-final errorHandler = ErrorHandler();
-
 /// Backward compatibility with static API
-/// Note: This is provided for compatibility but using the instance is preferred
+/// Note: This is provided for compatibility but using ErrorHandler.instance is preferred
 class ErrorHandlerCompat {
-  static final _instance = ErrorHandler();
-
   static void logError(
     String message,
     dynamic error, {
     StackTrace? stackTrace,
     String? context,
   }) {
-    _instance.logError(message, error, stackTrace: stackTrace, context: context);
+    ErrorHandler.instance.logError(message, error, stackTrace: stackTrace, context: context);
   }
 
   static void logWarning(String message, {String? context}) {
-    _instance.logWarning(message, context: context);
+    ErrorHandler.instance.logWarning(message, context: context);
   }
 
   static void logInfo(String message, {String? context}) {
-    _instance.logInfo(message, context: context);
+    ErrorHandler.instance.logInfo(message, context: context);
   }
 
   static String getUserFriendlyMessage(dynamic error) {
-    return _instance.getUserFriendlyMessage(error);
+    return ErrorHandler.instance.getUserFriendlyMessage(error);
   }
 
   static String handleException(
@@ -187,6 +190,6 @@ class ErrorHandlerCompat {
     StackTrace? stackTrace,
     String? context,
   }) {
-    return _instance.handleException(error, stackTrace: stackTrace, context: context);
+    return ErrorHandler.instance.handleException(error, stackTrace: stackTrace, context: context);
   }
 }
