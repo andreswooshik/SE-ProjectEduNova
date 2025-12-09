@@ -120,11 +120,14 @@ class FormValidators {
   /// 
   /// Enforces strong password requirements:
   /// - Minimum length requirement
-  /// - At least one letter
-  /// - At least one number
+  /// - At least one letter (optional)
+  /// - At least one number (optional)
   /// 
   /// For basic validation without complexity requirements, use [validatePasswordBasic].
-  static String? validatePassword(String? value, {bool enforceComplexity = true}) {
+  /// 
+  /// Note: Default is `enforceComplexity = false` for backward compatibility.
+  /// For new implementations, consider using `enforceComplexity: true`.
+  static String? validatePassword(String? value, {bool enforceComplexity = false}) {
     if (value == null || value.isEmpty) {
       return 'Please enter a password';
     }
@@ -245,7 +248,6 @@ class FormValidators {
     
     return null;
   }
-}
 
   /// Validates URL format
   static String? validateUrl(String? value, {bool required = false}) {
