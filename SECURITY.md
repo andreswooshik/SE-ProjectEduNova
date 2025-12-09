@@ -18,10 +18,12 @@ This document outlines security best practices for developing and maintaining th
 
 ✅ **DO:**
 - Use strong password hashing (bcrypt is already implemented)
-- Enforce minimum password length (currently 6 characters)
-- Validate passwords contain letters and numbers
+- Enforce minimum password length (currently 6 characters - **Note:** This is below industry standard of 8-12 characters and should be increased in future versions)
+- Validate passwords contain letters and numbers (optional complexity check available)
 - Never log or display passwords in plain text
 - Implement password strength indicators in UI
+
+**Current Implementation Note:** The minimum password length is set to 6 characters for user convenience during the prototype phase. For production release, this should be increased to at least 8 characters with mandatory complexity requirements (letters, numbers, and special characters).
 
 ❌ **DON'T:**
 - Store passwords in plain text

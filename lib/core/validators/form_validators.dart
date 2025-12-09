@@ -110,34 +110,42 @@ class FormValidators {
     return null;
   }
 
-  /// Validates password field
-  static String? validatePassword(String? value) {
+  /// Validates password field with enhanced security
+  /// 
+  /// Enforces strong password requirements:
+  /// - Minimum length requirement
+  /// - At least one letter
+  /// - At least one number
+  /// 
+  /// For basic validation without complexity requirements, use [validatePasswordBasic].
+  static String? validatePassword(String? value, {bool enforceComplexity = true}) {
     if (value == null || value.isEmpty) {
       return 'Please enter a password';
     }
     if (value.length < AppConstants.minPasswordLength) {
       return 'Password must be at least ${AppConstants.minPasswordLength} characters';
     }
-    // Check for at least one letter
-    if (!RegExp(r'[a-zA-Z]').hasMatch(value)) {
-      return 'Password must contain at least one letter';
+    
+    if (enforceComplexity) {
+      // Check for at least one letter
+      if (!RegExp(r'[a-zA-Z]').hasMatch(value)) {
+        return 'Password must contain at least one letter';
+      }
+      // Check for at least one number
+      if (!RegExp(r'[0-9]').hasMatch(value)) {
+        return 'Password must contain at least one number';
+      }
     }
-    // Check for at least one number
-    if (!RegExp(r'[0-9]').hasMatch(value)) {
-      return 'Password must contain at least one number';
-    }
+    
     return null;
   }
 
   /// Validates password field with basic requirement (for backward compatibility)
+  /// 
+  /// Only checks for minimum length. For enhanced security validation,
+  /// use [validatePassword] with enforceComplexity parameter.
   static String? validatePasswordBasic(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a password';
-    }
-    if (value.length < AppConstants.minPasswordLength) {
-      return 'Password must be at least ${AppConstants.minPasswordLength} characters';
-    }
-    return null;
+    return validatePassword(value, enforceComplexity: false);
   }
 
   /// Validates confirm password field
@@ -191,26 +199,64 @@ class FormValidators {
   }
 
   /// Validates general text input
+  /// 
+  /// A flexible validator for various text input fields with customizable constraints.
+  /// 
+  /// Parameters:
+  /// - [value]: The text to validate
+  /// - [fieldName]: Human-readable field name for error messages (e.g., 'username', 'title')
+  /// - [minLength]: Minimum required length (optional)
+  /// - [maxLength]: Maximum allowed length (optional)
+  /// - [required]: Whether the field is required (default: true)
+  /// 
+  /// Returns: Error message or null if valid
+  /// 
+  /// Example:
+  /// ```dart
+  /// validateTextField('John', fieldName: 'username', minLength: 3, maxLength: 20)
+  /// ```
   static String? validateTextField(String? value, {
     required String fieldName,
     int? minLength,
     int? maxLength,
     bool required = true,
   }) {
+    // Properly format field name for error messages
+    final formattedFieldName = _formatFieldName(fieldName);
+    
     if (required && (value == null || value.trim().isEmpty)) {
-      return 'Please enter $fieldName';
+      return 'Please enter $formattedFieldName';
     }
     
     if (value != null && value.trim().isNotEmpty) {
       if (minLength != null && value.trim().length < minLength) {
-        return '$fieldName must be at least $minLength characters';
+        return '${_capitalizeFirst(formattedFieldName)} must be at least $minLength characters';
       }
       if (maxLength != null && value.trim().length > maxLength) {
-        return '$fieldName must not exceed $maxLength characters';
+        return '${_capitalizeFirst(formattedFieldName)} must not exceed $maxLength characters';
       }
     }
     
     return null;
+  }
+
+  /// Formats field name for error messages with proper article
+  static String _formatFieldName(String fieldName) {
+    final lowercase = fieldName.toLowerCase();
+    // Check if needs article 'a' or 'an'
+    final needsArticle = !lowercase.startsWith(RegExp(r'^(the|your|a |an )'));
+    
+    if (!needsArticle) return lowercase;
+    
+    // Use 'an' for vowel sounds, 'a' for consonants
+    final startsWithVowel = RegExp(r'^[aeiou]', caseSensitive: false).hasMatch(lowercase);
+    return startsWithVowel ? 'an $lowercase' : 'a $lowercase';
+  }
+
+  /// Capitalizes the first letter of a string
+  static String _capitalizeFirst(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
   }
 
   /// Validates URL format
