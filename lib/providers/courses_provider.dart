@@ -2,25 +2,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/course.dart';
 import '../repositories/interfaces/i_course_repository.dart';
 import '../repositories/course_repository.dart';
+import '../services/interfaces/i_course_storage_service.dart';
+import '../services/course_storage_service.dart';
 import 'auth_provider.dart';
 
-/// Course repository provider
-/// Dependency Inversion: Depends on IStorageService abstraction
-final courseRepositoryProvider = Provider<ICourseRepository>((ref) {
+/// Course storage service provider
+final courseStorageServiceProvider = Provider<ICourseStorageService>((ref) {
   final storageService = ref.watch(storageServiceProvider);
-  return CourseRepository(storageService);
+  return CourseStorageService(storageService);
+});
+
+/// Course repository provider
+/// Dependency Inversion: Depends on abstractions
+final courseRepositoryProvider = Provider<ICourseRepository>((ref) {
+  final courseStorageService = ref.watch(courseStorageServiceProvider);
+  return CourseRepository(courseStorageService);
 });
 
 /// Courses state
 class CoursesState {
   final bool isLoading;
   final List<Course> courses;
+  final List<Course> myCourses;
   final Course? selectedCourse;
   final String? errorMessage;
 
   const CoursesState({
     this.isLoading = false,
     this.courses = const [],
+    this.myCourses = const [],
     this.selectedCourse,
     this.errorMessage,
   });
@@ -28,12 +38,14 @@ class CoursesState {
   CoursesState copyWith({
     bool? isLoading,
     List<Course>? courses,
+    List<Course>? myCourses,
     Course? selectedCourse,
     String? errorMessage,
   }) {
     return CoursesState(
       isLoading: isLoading ?? this.isLoading,
       courses: courses ?? this.courses,
+      myCourses: myCourses ?? this.myCourses,
       selectedCourse: selectedCourse ?? this.selectedCourse,
       errorMessage: errorMessage,
     );
@@ -69,8 +81,8 @@ class CoursesNotifier extends Notifier<CoursesState> {
     state = state.copyWith(isLoading: true);
 
     try {
-      final courses = await _courseRepository.getCoursesForStudent(studentId);
-      state = state.copyWith(isLoading: false, courses: courses);
+      final myCourses = await _courseRepository.getCoursesForStudent(studentId);
+      state = state.copyWith(isLoading: false, myCourses: myCourses);
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
@@ -121,7 +133,8 @@ class CoursesNotifier extends Notifier<CoursesState> {
     try {
       final success = await _courseRepository.enrollStudent(courseId, studentId);
       if (success) {
-        await loadAllCourses(); // Refresh the list
+        // Refresh my courses
+        await loadCoursesForStudent(studentId);
       }
       return success;
     } catch (e) {

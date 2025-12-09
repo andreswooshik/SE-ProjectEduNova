@@ -30,7 +30,7 @@ class NotificationsPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettingsPage(userName: ''),
+                  builder: (context) => const SettingsPage(),
                 ),
               );
             },

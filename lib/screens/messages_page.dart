@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/custom_search_bar.dart';
 
 class MessagesPage extends StatelessWidget {
   const MessagesPage({Key? key}) : super(key: key);
@@ -29,28 +30,7 @@ class MessagesPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Search Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search Here',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.grey.shade400),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const CustomSearchBar(),
             const SizedBox(height: 24),
 
             // Chat and Calls Tabs

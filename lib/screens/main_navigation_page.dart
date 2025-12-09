@@ -5,10 +5,7 @@ import 'my_courses_page.dart';
 import 'messages_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
-  final String userName;
-
-  const MainNavigationPage({Key? key, required this.userName})
-      : super(key: key);
+  const MainNavigationPage({Key? key}) : super(key: key);
 
   @override
   State<MainNavigationPage> createState() => _MainNavigationPageState();
@@ -23,10 +20,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   void initState() {
     super.initState();
     _pages = [
-      StudentDashboardPage(userName: widget.userName),
+      const StudentDashboardPage(),
       const MyCoursesPage(),
       const MessagesPage(),
-      ProfilePage(userName: widget.userName),
+      const ProfilePage(),
     ];
   }
 

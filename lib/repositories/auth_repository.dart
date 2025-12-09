@@ -2,6 +2,8 @@ import 'dart:convert';
 import '../core/constants/app_constants.dart';
 import '../models/user.dart';
 import '../services/interfaces/i_storage_service.dart';
+import '../services/interfaces/i_user_storage_service.dart';
+import '../services/admin_auth_service.dart';
 import '../core/utils/hash_utils.dart';
 import 'interfaces/i_auth_repository.dart';
 
@@ -9,60 +11,38 @@ import 'interfaces/i_auth_repository.dart';
 /// Open/Closed Principle: Can be extended or replaced without modifying clients
 class AuthRepository implements IAuthRepository {
   final IStorageService _storageService;
+  final IUserStorageService _userStorageService;
+  final AdminAuthService _adminAuthService;
 
-  AuthRepository(this._storageService);
+  AuthRepository(
+    this._storageService,
+    this._userStorageService,
+    this._adminAuthService,
+  );
 
   @override
   Future<User?> signIn(String email, String password) async {
     if (email.isEmpty || password.isEmpty) return null;
 
     // Admin Account Check
-    if (email == 'admin@edunova.ph' && password == 'admin123') {
-      final admin = Admin(
-        id: 'admin-001',
-        firstName: 'System',
-        lastName: 'Admin',
-        email: email,
-        passwordHash: HashUtils.hashPassword(password),
-      );
-      
-      // Save admin session
-      await _storageService.saveString(
-        AppConstants.currentUserKey,
-        jsonEncode(admin.toJson()),
-      );
-      await _storageService.saveBool(AppConstants.isLoggedInKey, true);
-      
+    final admin = _adminAuthService.authenticate(email, password);
+    if (admin != null) {
+      await _saveSession(admin);
       return admin;
     }
 
-    final users = await _getAllUsers();
+    final user = await _userStorageService.getUserByEmail(email);
 
-    try {
-      final user = users.firstWhere(
-        (u) => u.email.toLowerCase() == email.toLowerCase(),
-      );
-
-      if (HashUtils.verifyPassword(password, user.passwordHash)) {
-        // Save current user
-        await _storageService.saveString(
-          AppConstants.currentUserKey,
-          jsonEncode(user.toJson()),
-        );
-        await _storageService.saveBool(AppConstants.isLoggedInKey, true);
-
-        return user;
-      }
-      return null;
-    } catch (e) {
-      return null;
+    if (user != null && HashUtils.verifyPassword(password, user.passwordHash)) {
+      await _saveSession(user);
+      return user;
     }
+    return null;
   }
 
   @override
   Future<User> registerStudent(StudentRegistrationData data) async {
-    // Check if email already exists
-    if (await emailExists(data.email)) {
+    if (await _userStorageService.emailExists(data.email)) {
       throw Exception('Email already registered');
     }
 
@@ -76,23 +56,15 @@ class AuthRepository implements IAuthRepository {
       schoolId: data.schoolId,
     );
 
-    // Save user to storage
-    await _saveUser(student);
-
-    // Set as current user
-    await _storageService.saveString(
-      AppConstants.currentUserKey,
-      jsonEncode(student.toJson()),
-    );
-    await _storageService.saveBool(AppConstants.isLoggedInKey, true);
+    await _userStorageService.saveUser(student);
+    await _saveSession(student);
 
     return student;
   }
 
   @override
   Future<User> registerTeacher(TeacherRegistrationData data) async {
-    // Check if email already exists
-    if (await emailExists(data.email)) {
+    if (await _userStorageService.emailExists(data.email)) {
       throw Exception('Email already registered');
     }
 
@@ -106,15 +78,8 @@ class AuthRepository implements IAuthRepository {
       employeeId: data.employeeId,
     );
 
-    // Save user to storage
-    await _saveUser(teacher);
-
-    // Set as current user
-    await _storageService.saveString(
-      AppConstants.currentUserKey,
-      jsonEncode(teacher.toJson()),
-    );
-    await _storageService.saveBool(AppConstants.isLoggedInKey, true);
+    await _userStorageService.saveUser(teacher);
+    await _saveSession(teacher);
 
     return teacher;
   }
@@ -145,27 +110,14 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<bool> emailExists(String email) async {
-    final users = await _getAllUsers();
-    return users.any((u) => u.email.toLowerCase() == email.toLowerCase());
+    return await _userStorageService.emailExists(email);
   }
 
-  /// Private helper to get all users from storage
-  Future<List<User>> _getAllUsers() async {
-    final usersJson = await _storageService.getStringList(AppConstants.usersListKey);
-    if (usersJson == null || usersJson.isEmpty) return [];
-
-    return usersJson.map((json) {
-      final Map<String, dynamic> data = jsonDecode(json);
-      return User.fromJson(data);
-    }).toList();
-  }
-
-  /// Private helper to save a user to storage
-  Future<void> _saveUser(User user) async {
-    final users = await _getAllUsers();
-    users.add(user);
-
-    final usersJson = users.map((u) => jsonEncode(u.toJson())).toList();
-    await _storageService.saveStringList(AppConstants.usersListKey, usersJson);
+  Future<void> _saveSession(User user) async {
+    await _storageService.saveString(
+      AppConstants.currentUserKey,
+      jsonEncode(user.toJson()),
+    );
+    await _storageService.saveBool(AppConstants.isLoggedInKey, true);
   }
 }
