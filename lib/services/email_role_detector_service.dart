@@ -18,7 +18,7 @@ import 'interfaces/i_email_role_detector.dart';
 /// ```dart
 /// final detector = EmailRoleDetectorService();
 /// final role = detector.detectRole('teacher@university.edu');
-/// print(role); // UserRole.teacher
+/// debugPrint('Detected role: $role'); // UserRole.teacher
 /// ```
 class EmailRoleDetectorService implements IEmailRoleDetector {
   // Teacher/Work email domains (educational and organizational)
