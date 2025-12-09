@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/custom_text_field.dart';
+import '../core/constants/app_constants.dart';
 import 'sign_up_page.dart';
 import 'main_navigation_page.dart';
+import 'student_dashboard_page.dart';
+import 'teacher_dashboard_page.dart';
 
 class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -133,12 +136,36 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                             .signIn(_emailController.text, _passwordController.text);
 
                         if (success && mounted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainNavigationPage(),
-                            ),
-                          );
+                          final user = ref.read(authProvider).user;
+                          
+                          // Role-based navigation
+                          // Liskov Substitution Principle: User can be Student or Teacher
+                          // Open/Closed Principle: Easy to add new roles without modifying
+                          if (user?.role == UserRole.teacher) {
+                            // Navigate to Teacher Dashboard
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const TeacherDashboardPage(),
+                              ),
+                            );
+                          } else if (user?.role == UserRole.student) {
+                            // Navigate to Student Dashboard (via main navigation)
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MainNavigationPage(),
+                              ),
+                            );
+                          } else {
+                            // Default navigation for other roles
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MainNavigationPage(),
+                              ),
+                            );
+                          }
                         } else if (mounted) {
                           final error = ref.read(authProvider).errorMessage;
                           ScaffoldMessenger.of(context).showSnackBar(

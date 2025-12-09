@@ -4,9 +4,12 @@ import '../repositories/interfaces/i_auth_repository.dart';
 import '../repositories/auth_repository.dart';
 import '../services/interfaces/i_storage_service.dart';
 import '../services/interfaces/i_user_storage_service.dart';
+import '../services/interfaces/i_email_role_detector.dart';
 import '../services/local_storage_service.dart';
 import '../services/user_storage_service.dart';
 import '../services/admin_auth_service.dart';
+import '../services/email_role_detector_service.dart';
+import '../core/constants/app_constants.dart';
 
 /// Storage service provider
 /// Dependency Inversion: Provides abstraction, not concrete implementation
@@ -23,6 +26,12 @@ final userStorageServiceProvider = Provider<IUserStorageService>((ref) {
 /// Admin auth service provider
 final adminAuthServiceProvider = Provider<AdminAuthService>((ref) {
   return AdminAuthService();
+});
+
+/// Email role detector service provider
+/// Dependency Inversion: Depends on abstraction
+final emailRoleDetectorProvider = Provider<IEmailRoleDetector>((ref) {
+  return EmailRoleDetectorService();
 });
 
 /// Auth repository provider
@@ -182,6 +191,56 @@ class AuthNotifier extends Notifier<AuthState> {
       final user = await _authRepository.registerTeacher(data);
       state = AuthState.authenticated(user);
       return true;
+    } catch (e) {
+      state = AuthState.error(e.toString());
+      return false;
+    }
+  }
+
+  /// Register a new user with automatic role detection
+  /// Single Responsibility Principle: Delegates role detection to service
+  /// Open/Closed Principle: Can add new role detection logic without modifying this method
+  Future<bool> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String school,
+    required String password,
+  }) async {
+    state = AuthState.loading();
+
+    try {
+      // Detect role from email using email role detector service
+      final emailRoleDetector = ref.read(emailRoleDetectorProvider);
+      final detectedRole = emailRoleDetector.detectRole(email);
+
+      // Register based on detected role
+      if (detectedRole == UserRole.teacher) {
+        // Generate employee ID from timestamp for teachers
+        final employeeId = DateTime.now().millisecondsSinceEpoch % 1000000;
+        
+        return await registerTeacher(
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          school: school,
+          employeeId: employeeId,
+          password: password,
+        );
+      } else {
+        // Register as student (default)
+        // Generate school ID from timestamp for students
+        final schoolId = DateTime.now().millisecondsSinceEpoch % 1000000;
+        
+        return await registerStudent(
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          school: school,
+          schoolId: schoolId,
+          password: password,
+        );
+      }
     } catch (e) {
       state = AuthState.error(e.toString());
       return false;

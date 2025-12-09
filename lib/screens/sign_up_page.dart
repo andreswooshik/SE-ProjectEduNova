@@ -15,6 +15,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _schoolController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
@@ -24,6 +25,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _schoolController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -102,6 +104,20 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                 const SizedBox(height: 16),
 
                 CustomTextField(
+                  label: 'School/University',
+                  hintText: 'Your Institution Name',
+                  controller: _schoolController,
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your school or university';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
                   label: 'Password',
                   hintText: '******************',
                   controller: _passwordController,
@@ -167,12 +183,12 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         final firstName = nameParts.first;
                         final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-                        final success = await ref.read(authProvider.notifier).registerStudent(
+                        // Use unified register method - automatically detects role
+                        final success = await ref.read(authProvider.notifier).register(
                           firstName: firstName,
                           lastName: lastName,
-                          email: _emailController.text,
-                          school: 'Default School', // Should be an input
-                          schoolId: 0, // Should be an input
+                          email: _emailController.text.trim(),
+                          school: _schoolController.text.trim(),
                           password: _passwordController.text,
                         );
 
