@@ -182,11 +182,11 @@ class LengthValidator extends BaseValidator {
       final trimmed = getTrimmed(value);
       // Safe null check before using value
       if (trimmed != null) {
-        if (minLength != null && trimmed.length < minLength) {
+        if (minLength != null && trimmed.length < minLength!) {
           return '${StringFormatUtils.capitalizeFirst(formattedName)} must be at least $minLength characters';
         }
         
-        if (maxLength != null && trimmed.length > maxLength) {
+        if (maxLength != null && trimmed.length > maxLength!) {
           return '${StringFormatUtils.capitalizeFirst(formattedName)} must not exceed $maxLength characters';
         }
       }
