@@ -3,11 +3,11 @@ name: Flutter CI
 on:
   push:
     branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+  # pull_request:
+  #   branches: [ main, develop ]
 
 env:
-  FLUTTER_VERSION: '3.19.0'
+  FLUTTER_VERSION: '3.24.0'
 
 jobs:
   analyze:

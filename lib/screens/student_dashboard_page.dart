@@ -41,6 +41,7 @@ class StudentDashboardPage extends ConsumerWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
+      automaticallyImplyLeading: false, // Remove back button
       title: Text(
         'Welcome, $userName',
         style: const TextStyle(

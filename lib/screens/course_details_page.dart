@@ -2,8 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/course.dart';
 import '../providers/enrollment_provider.dart';
+import 'enrolled_course_details_page.dart';
 
+/// Course details page that displays comprehensive information about a course
+/// and allows students to enroll.
+/// 
+/// This widget follows the Single Responsibility Principle by focusing solely
+/// on displaying course details and handling enrollment actions.
+/// 
+/// IMPORTANT: This page uses course.id for enrollment operations, NOT course.title.
+/// This ensures accurate course identification even when multiple courses have
+/// similar titles.
 class CourseDetailsPage extends ConsumerStatefulWidget {
+  /// The complete course object containing all course information including the unique ID
   final Course course;
 
   const CourseDetailsPage({
@@ -120,6 +131,9 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
   }
 
   Widget _buildOverviewTab() {
+    // Check enrollment status using course.id for accurate identification
+    // Using course.id instead of course.title prevents issues with duplicate
+    // or similar course names
     final isEnrolled =
         ref.watch(enrollmentProvider.notifier).isEnrolled(widget.course.id);
 
@@ -245,8 +259,20 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
     );
   }
 
+  /// Handles the enrollment action when the user taps the enroll button.
+  /// 
+  /// This method:
+  /// 1. Checks enrollment status using the unique course.id
+  /// 2. Prevents duplicate enrollments
+  /// 3. Enrolls the complete course object (not just ID) to maintain full course data
+  /// 4. Provides user feedback via SnackBar
+  /// 5. Navigates to EnrolledCourseDetailsPage after successful enrollment
+  /// 
+  /// CRITICAL: Always uses course.id for enrollment operations to ensure
+  /// correct course identification.
   void _handleEnrollment() {
     final enrollmentNotifier = ref.read(enrollmentProvider.notifier);
+    // Check if already enrolled using course.id (unique identifier)
     final isEnrolled = enrollmentNotifier.isEnrolled(widget.course.id);
 
     if (isEnrolled) {
@@ -257,14 +283,33 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
         ),
       );
     } else {
+      // Enroll the complete course object to preserve all course data
+      // The enrollmentProvider will use course.id internally for deduplication
       enrollmentNotifier.enrollCourse(widget.course);
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Successfully enrolled!'),
           backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
         ),
       );
-      setState(() {}); // Refresh UI
+      
+      // Navigate to enrolled course details screen after successful enrollment
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EnrolledCourseDetailsPage(
+                courseTitle: widget.course.title,
+                instructor: widget.course.instructor ?? 'Unknown Instructor',
+                accentColor: widget.course.accentColor ?? Colors.blue,
+              ),
+            ),
+          );
+        }
+      });
     }
   }
 
