@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 import '../models/course.dart';
 import '../screens/course_details_page.dart';
+import '../screens/enrolled_course_details_page.dart';
 
+/// A reusable card widget for displaying course information.
+/// 
+/// This widget follows the Single Responsibility Principle by focusing
+/// solely on course card presentation and navigation.
+/// 
+/// IMPORTANT: Always passes the complete Course object (not just title or ID)
+/// to CourseDetailsPage to ensure all course data is available and enrollment
+/// uses the correct course.id for identification.
 class CourseCard extends StatelessWidget {
+  /// The complete course object to display
   final Course course;
+  
+  /// Optional custom tap handler. If null, navigates to appropriate page
   final VoidCallback? onTap;
+  
+  /// Whether the user is enrolled in this course
+  /// If true, navigates to EnrolledCourseDetailsPage
+  /// If false, navigates to CourseDetailsPage
+  final bool isEnrolled;
 
   const CourseCard({
     Key? key,
     required this.course,
     this.onTap,
+    this.isEnrolled = false,
   }) : super(key: key);
 
   @override
@@ -17,14 +35,30 @@ class CourseCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ??
           () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CourseDetailsPage(
-                  course: course,
+            if (isEnrolled) {
+              // Navigate to enrolled course details page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EnrolledCourseDetailsPage(
+                    courseTitle: course.title,
+                    instructor: course.instructor ?? 'Unknown Instructor',
+                    accentColor: course.accentColor ?? Colors.blue,
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              // Navigate to course details, passing the complete course object
+              // This ensures CourseDetailsPage has access to course.id for enrollment
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CourseDetailsPage(
+                    course: course,
+                  ),
+                ),
+              );
+            }
           },
       child: Container(
         decoration: BoxDecoration(

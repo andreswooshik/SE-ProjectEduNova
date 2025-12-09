@@ -104,7 +104,10 @@ class MyCoursesPage extends ConsumerWidget {
                     itemCount: enrolledCourses.length,
                     itemBuilder: (context, index) {
                       final course = enrolledCourses[index];
-                      return CourseCard(course: course);
+                      return CourseCard(
+                        course: course,
+                        isEnrolled: true, // Mark as enrolled to navigate to EnrolledCourseDetailsPage
+                      );
                     },
                   ),
                 ],
