@@ -3,16 +3,80 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../core/constants/app_constants.dart';
 import '../models/user.dart';
+import '../models/course.dart';
 import 'settings_page.dart';
 import 'notifications_page.dart';
+import 'teacher_course_detail_page.dart';
 
 /// Teacher Dashboard Page - Only accessible by users with teacher role
 /// Single Responsibility Principle: Handles only teacher dashboard UI
-class TeacherDashboardPage extends ConsumerWidget {
+class TeacherDashboardPage extends ConsumerStatefulWidget {
   const TeacherDashboardPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TeacherDashboardPage> createState() => _TeacherDashboardPageState();
+}
+
+class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
+  final List<String> categories = ['Web', 'Cryptography', 'Figma'];
+  String selectedCategory = 'Web';
+
+  // Sample courses data for the teacher
+  final List<Course> teacherCourses = [
+    Course(
+      id: '1',
+      title: 'Graphic Design',
+      description: 'Learn the fundamentals of graphic design including typography, color theory, and layout principles.',
+      teacherId: 'teacher1',
+      instructor: 'By Kenneth Coppock',
+      progress: '45% Done',
+      thumbnailAsset: 'assets/images/graphic_design.jpg',
+      accentColor: Colors.pink,
+    ),
+    Course(
+      id: '2',
+      title: 'Wireframing',
+      description: 'Master the art of wireframing and prototyping for web and mobile applications.',
+      teacherId: 'teacher1',
+      instructor: 'By Shivalo Alo',
+      progress: '45% Done',
+      thumbnailAsset: 'assets/images/wireframing.jpg',
+      accentColor: Colors.grey,
+    ),
+    Course(
+      id: '3',
+      title: 'Website Design',
+      description: 'Complete guide to modern website design with hands-on projects.',
+      teacherId: 'teacher1',
+      instructor: 'By Dwayne Wade',
+      progress: '45% Done',
+      thumbnailAsset: 'assets/images/website_design.jpg',
+      accentColor: Colors.orange,
+    ),
+    Course(
+      id: '4',
+      title: 'Video Editing',
+      description: 'Professional video editing techniques and workflows.',
+      teacherId: 'teacher1',
+      instructor: 'By Ammar Cruz',
+      progress: '45% Done',
+      thumbnailAsset: 'assets/images/video_editing.jpg',
+      accentColor: Colors.purple,
+    ),
+    Course(
+      id: '5',
+      title: 'Cybersecurity',
+      description: 'Comprehensive cybersecurity fundamentals covering threat analysis, network security, and best practices.',
+      teacherId: 'teacher1',
+      instructor: 'By Syed Hasnain',
+      progress: '45% Done',
+      thumbnailAsset: 'assets/images/cybersecurity.jpg',
+      accentColor: Colors.blue,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
 
@@ -46,228 +110,289 @@ class TeacherDashboardPage extends ConsumerWidget {
     }
 
     final teacher = user as Teacher;
-    final teacherName = teacher.fullName;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _buildAppBar(context, teacherName),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context, teacher),
+                const SizedBox(height: 24),
+                _buildSearchBar(),
+                const SizedBox(height: 20),
+                _buildCategoryChips(),
+                const SizedBox(height: 24),
+                _buildCoursesHeader(),
+                const SizedBox(height: 16),
+                _buildCoursesGrid(),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, Teacher teacher) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+                children: [
+                  const TextSpan(text: 'Welcome, '),
+                  TextSpan(
+                    text: 'Teacher',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined, size: 28),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsPage(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.notifications_outlined, size: 28),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const TextField(
+        decoration: InputDecoration(
+          hintText: 'Search Here',
+          hintStyle: TextStyle(color: Colors.grey),
+          border: InputBorder.none,
+          icon: Icon(Icons.search, color: Colors.grey),
+          contentPadding: EdgeInsets.symmetric(vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryChips() {
+    return Row(
+      children: categories.map((category) {
+        final isSelected = category == selectedCategory;
+        return Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: ChoiceChip(
+            label: Text(category),
+            selected: isSelected,
+            onSelected: (selected) {
+              setState(() {
+                selectedCategory = category;
+              });
+            },
+            backgroundColor: Colors.white,
+            selectedColor: Theme.of(context).primaryColor.withOpacity(0.1),
+            labelStyle: TextStyle(
+              color: isSelected ? Theme.of(context).primaryColor : Colors.black,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+            side: BorderSide(
+              color: isSelected
+                  ? Theme.of(context).primaryColor
+                  : Colors.grey[300]!,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildCoursesHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          'Courses',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            // Navigate to all courses
+          },
+          child: const Text(
+            'See All',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCoursesGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: teacherCourses.length,
+      itemBuilder: (context, index) {
+        return _buildCourseCard(teacherCourses[index]);
+      },
+    );
+  }
+
+  Widget _buildCourseCard(Course course) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeacherCourseDetailPage(course: course),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildWelcomeCard(teacher),
-            const SizedBox(height: 24),
-            _buildQuickActions(context),
-            const SizedBox(height: 24),
-            _buildClassesSection(),
-            const SizedBox(height: 24),
-            _buildUpcomingSection(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context, String teacherName) {
-    return AppBar(
-      backgroundColor: const Color(0xFF003366),
-      elevation: 0,
-      title: Text(
-        'Teacher Portal',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.settings_outlined, color: Colors.white),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SettingsPage(),
+            // Course thumbnail
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                color: course.accentColor?.withOpacity(0.1) ?? Colors.grey[200],
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
               ),
-            );
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationsPage(),
+              child: Center(
+                child: Icon(
+                  _getCourseIcon(course.title),
+                  size: 48,
+                  color: course.accentColor ?? Colors.grey,
+                ),
               ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWelcomeCard(Teacher teacher) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF003366), Color(0xFF004080)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Welcome back,',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            teacher.fullName,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.school, color: Colors.white70, size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  teacher.school,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    course.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Icon(Icons.badge, color: Colors.white70, size: 16),
-              const SizedBox(width: 8),
-              Text(
-                'Employee ID: ${teacher.employeeId}',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActions(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionCard(
-                icon: Icons.add_circle_outline,
-                title: 'Create Course',
-                color: const Color(0xFF4CAF50),
-                onTap: () {
-                  // Navigate to create course
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildActionCard(
-                icon: Icons.assignment_outlined,
-                title: 'Grade Submissions',
-                color: const Color(0xFFFF9800),
-                onTap: () {
-                  // Navigate to grade submissions
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionCard(
-                icon: Icons.people_outline,
-                title: 'Manage Students',
-                color: const Color(0xFF2196F3),
-                onTap: () {
-                  // Navigate to manage students
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildActionCard(
-                icon: Icons.analytics_outlined,
-                title: 'View Analytics',
-                color: const Color(0xFF9C27B0),
-                onTap: () {
-                  // Navigate to analytics
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionCard({
-    required IconData icon,
-    required String title,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: color,
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    course.instructor ?? 'By Instructor',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Progress bar
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LinearProgressIndicator(
+                        value: 0.45,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).primaryColor,
+                        ),
+                        minHeight: 4,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        course.progress ?? '45% Done',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -276,186 +401,56 @@ class TeacherDashboardPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildClassesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'My Classes',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('View All'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildClassCard(
-          title: 'Introduction to Programming',
-          students: 42,
-          color: const Color(0xFF4CAF50),
-        ),
-        const SizedBox(height: 12),
-        _buildClassCard(
-          title: 'Web Development Fundamentals',
-          students: 35,
-          color: const Color(0xFF2196F3),
-        ),
-        const SizedBox(height: 12),
-        _buildClassCard(
-          title: 'Database Management Systems',
-          students: 38,
-          color: const Color(0xFFFF9800),
-        ),
-      ],
-    );
+  IconData _getCourseIcon(String title) {
+    if (title.toLowerCase().contains('design')) {
+      return Icons.brush;
+    } else if (title.toLowerCase().contains('video')) {
+      return Icons.videocam;
+    } else if (title.toLowerCase().contains('website') || title.toLowerCase().contains('web')) {
+      return Icons.web;
+    } else if (title.toLowerCase().contains('wireframe')) {
+      return Icons.dashboard_customize;
+    } else if (title.toLowerCase().contains('cybersecurity') || title.toLowerCase().contains('security')) {
+      return Icons.security;
+    }
+    return Icons.school;
   }
 
-  Widget _buildClassCard({
-    required String title,
-    required int students,
-    required Color color,
-  }) {
+  Widget _buildBottomNavBar() {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
-            ),
+      child: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Colors.grey,
+        currentIndex: 0,
+        elevation: 0,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '',
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.people, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$students students',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: '',
           ),
-          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUpcomingSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Upcoming',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message_outlined),
+            label: '',
           ),
-        ),
-        const SizedBox(height: 12),
-        _buildUpcomingItem(
-          title: 'Quiz 2 - Programming Basics',
-          time: 'Today, 2:00 PM',
-          icon: Icons.quiz_outlined,
-          color: const Color(0xFFFF5722),
-        ),
-        const SizedBox(height: 12),
-        _buildUpcomingItem(
-          title: 'Assignment Review',
-          time: 'Tomorrow, 10:00 AM',
-          icon: Icons.assignment_outlined,
-          color: const Color(0xFF2196F3),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUpcomingItem({
-    required String title,
-    required String time,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  time,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: '',
           ),
         ],
       ),
