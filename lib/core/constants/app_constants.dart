@@ -1,5 +1,3 @@
-import '../../models/university.dart';
-
 /// App-wide constants following Single Responsibility Principle
 /// This class only handles constant values used throughout the app
 class AppConstants {
@@ -27,6 +25,7 @@ class AppConstants {
   static const String usersListKey = 'users_list';
   static const String coursesListKey = 'courses_list';
   static const String isLoggedInKey = 'is_logged_in';
+  static const String storagePrefix = 'edunova_'; // Storage prefix for all keys
 }
 
 /// User roles enumeration

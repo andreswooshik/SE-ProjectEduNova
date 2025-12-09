@@ -5,7 +5,6 @@ import '../widgets/custom_text_field.dart';
 import '../core/constants/app_constants.dart';
 import 'sign_up_page.dart';
 import 'main_navigation_page.dart';
-import 'student_dashboard_page.dart';
 import 'teacher_dashboard_page.dart';
 
 class SignInPage extends ConsumerStatefulWidget {

@@ -14,6 +14,17 @@ dependencies:
   shared_preferences: ^2.5.3
   crypto: ^3.0.7
   bcrypt: ^1.1.3
+  
+  # File handling
+  file_picker: ^8.0.0+1
+  path_provider: ^2.1.2
+  path: ^1.9.0
+  
+  # File viewing
+  open_file: ^3.3.2
+  
+  # MIME type detection
+  mime: ^1.0.5
 
 dev_dependencies:
   flutter_test:
