@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/courses_provider.dart';
+import '../providers/auth_provider.dart';
+import '../models/course.dart';
 import 'my_courses_page.dart';
 
-class CourseDetailsPage extends StatefulWidget {
+class CourseDetailsPage extends ConsumerStatefulWidget {
   final String courseTitle;
   final String instructor;
   final Color accentColor;
@@ -14,10 +18,10 @@ class CourseDetailsPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CourseDetailsPage> createState() => _CourseDetailsPageState();
+  ConsumerState<CourseDetailsPage> createState() => _CourseDetailsPageState();
 }
 
-class _CourseDetailsPageState extends State<CourseDetailsPage> {
+class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
   int _selectedIndex = 0;
 
   @override
@@ -268,9 +272,18 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
           width: double.infinity,
           height: 56,
           child: ElevatedButton(
-            onPressed: () {
-              bool isAlreadyEnrolled = MyCoursesPage.enrolledCourses
-                  .any((course) => course['title'] == widget.courseTitle);
+            onPressed: () async {
+              final user = ref.read(authProvider).user;
+              if (user == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please sign in to enroll')),
+                );
+                return;
+              }
+
+              final myCourses = ref.read(coursesProvider).myCourses;
+              final isAlreadyEnrolled = myCourses.any((c) => c.title == widget.courseTitle);
+
               if (isAlreadyEnrolled) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -280,25 +293,45 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                   ),
                 );
               } else {
-                // Add course to enrolled courses
-                MyCoursesPage.addEnrolledCourse(
-                  title: widget.courseTitle,
-                  instructor: widget.instructor,
-                  accentColor: widget.accentColor,
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Successfully enrolled in the course!'),
-                    duration: Duration(seconds: 2),
-                    backgroundColor: Colors.green,
+                // Find course or create mock
+                final allCourses = ref.read(coursesProvider).courses;
+                final course = allCourses.firstWhere(
+                  (c) => c.title == widget.courseTitle,
+                  orElse: () => Course(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    title: widget.courseTitle,
+                    description: 'Enrolled via details',
+                    teacherId: 'unknown',
                   ),
                 );
 
-                Future.delayed(const Duration(seconds: 1), () {
-                  Navigator.pop(context);
-                });
+                final success = await ref.read(coursesProvider.notifier).enrollStudent(course.id, user.id);
+
+                if (success && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Successfully enrolled in the course!'),
+                      duration: Duration(seconds: 2),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+
+                  Future.delayed(const Duration(seconds: 1), () {
+                    if (mounted) Navigator.pop(context);
+                  });
+                } else if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Enrollment failed')),
+                  );
+                }
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF003366),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             child: const Text(
               'ENROLL NOW',
               style: TextStyle(

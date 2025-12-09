@@ -3,7 +3,10 @@ import '../models/user.dart';
 import '../repositories/interfaces/i_auth_repository.dart';
 import '../repositories/auth_repository.dart';
 import '../services/interfaces/i_storage_service.dart';
+import '../services/interfaces/i_user_storage_service.dart';
 import '../services/local_storage_service.dart';
+import '../services/user_storage_service.dart';
+import '../services/admin_auth_service.dart';
 
 /// Storage service provider
 /// Dependency Inversion: Provides abstraction, not concrete implementation
@@ -11,11 +14,24 @@ final storageServiceProvider = Provider<IStorageService>((ref) {
   return LocalStorageService();
 });
 
+/// User storage service provider
+final userStorageServiceProvider = Provider<IUserStorageService>((ref) {
+  final storageService = ref.watch(storageServiceProvider);
+  return UserStorageService(storageService);
+});
+
+/// Admin auth service provider
+final adminAuthServiceProvider = Provider<AdminAuthService>((ref) {
+  return AdminAuthService();
+});
+
 /// Auth repository provider
-/// Dependency Inversion: Depends on IStorageService abstraction
+/// Dependency Inversion: Depends on abstractions
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   final storageService = ref.watch(storageServiceProvider);
-  return AuthRepository(storageService);
+  final userStorageService = ref.watch(userStorageServiceProvider);
+  final adminAuthService = ref.watch(adminAuthServiceProvider);
+  return AuthRepository(storageService, userStorageService, adminAuthService);
 });
 
 /// Authentication state

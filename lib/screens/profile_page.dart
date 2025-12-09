@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
 
-class ProfilePage extends StatelessWidget {
-  final String userName;
-
-  const ProfilePage({Key? key, required this.userName}) : super(key: key);
+class ProfilePage extends ConsumerWidget {
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    final fullName = user != null ? '${user.firstName} ${user.lastName}' : 'Guest User';
+    final email = user?.email ?? 'No Email';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -78,7 +83,10 @@ class ProfilePage extends StatelessWidget {
 
                   // Name
                   Text(
-                    'Name Here',
+                    fullName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -89,7 +97,10 @@ class ProfilePage extends StatelessWidget {
 
                   // Tag Line
                   Text(
-                    'Tag Line',
+                    email,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade600,

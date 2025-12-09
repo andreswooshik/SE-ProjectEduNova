@@ -1,25 +1,17 @@
-import 'dart:convert';
-import '../core/constants/app_constants.dart';
 import '../models/course.dart';
-import '../services/interfaces/i_storage_service.dart';
+import '../services/interfaces/i_course_storage_service.dart';
 import 'interfaces/i_course_repository.dart';
 
 /// Concrete implementation of ICourseRepository
 /// Open/Closed Principle: Can be extended or replaced without modifying clients
 class CourseRepository implements ICourseRepository {
-  final IStorageService _storageService;
+  final ICourseStorageService _courseStorageService;
 
-  CourseRepository(this._storageService);
+  CourseRepository(this._courseStorageService);
 
   @override
   Future<List<Course>> getAllCourses() async {
-    final coursesJson = await _storageService.getStringList(AppConstants.coursesListKey);
-    if (coursesJson == null || coursesJson.isEmpty) return [];
-
-    return coursesJson.map((json) {
-      final Map<String, dynamic> data = jsonDecode(json);
-      return Course.fromJson(data);
-    }).toList();
+    return await _courseStorageService.getAllCourses();
   }
 
   @override
@@ -48,7 +40,7 @@ class CourseRepository implements ICourseRepository {
   Future<Course> createCourse(Course course) async {
     final courses = await getAllCourses();
     courses.add(course);
-    await _saveCourses(courses);
+    await _courseStorageService.saveCourses(courses);
     return course;
   }
 
@@ -62,7 +54,7 @@ class CourseRepository implements ICourseRepository {
     }
 
     courses[index] = course.copyWith(updatedAt: DateTime.now());
-    await _saveCourses(courses);
+    await _courseStorageService.saveCourses(courses);
     return courses[index];
   }
 
@@ -76,7 +68,7 @@ class CourseRepository implements ICourseRepository {
       return false;
     }
 
-    await _saveCourses(courses);
+    await _courseStorageService.saveCourses(courses);
     return true;
   }
 
@@ -133,11 +125,5 @@ class CourseRepository implements ICourseRepository {
       assignments: [...course.assignments, assignment],
     );
     return updateCourse(updatedCourse);
-  }
-
-  /// Private helper to save all courses to storage
-  Future<void> _saveCourses(List<Course> courses) async {
-    final coursesJson = courses.map((c) => jsonEncode(c.toJson())).toList();
-    await _storageService.saveStringList(AppConstants.coursesListKey, coursesJson);
   }
 }

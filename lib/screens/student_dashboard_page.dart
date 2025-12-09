@@ -1,306 +1,184 @@
 import 'package:flutter/material.dart';
-import 'course_details_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/category_chip.dart';
+import '../widgets/course_card.dart';
+import '../widgets/custom_search_bar.dart';
 import 'settings_page.dart';
 import 'notifications_page.dart';
 
-class StudentDashboardPage extends StatelessWidget {
-  final String userName;
-
-  const StudentDashboardPage({Key? key, required this.userName})
-      : super(key: key);
+class StudentDashboardPage extends ConsumerWidget {
+  const StudentDashboardPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final userName = authState.user?.firstName ?? 'Student';
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          'Welcome, $userName',
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsPage(userName: userName),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationsPage(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(context, userName),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search Here',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.grey.shade400),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const CustomSearchBar(),
             const SizedBox(height: 24),
-
-            // Category Chips
-            SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildCategoryChip('Web', true),
-                  const SizedBox(width: 12),
-                  _buildCategoryChip('Cryptography', false),
-                  const SizedBox(width: 12),
-                  _buildCategoryChip('Figma', false),
-                ],
-              ),
-            ),
+            _buildCategories(),
             const SizedBox(height: 24),
-
-            // Courses Section Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Courses',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'See All',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
+            _buildCoursesHeader(),
             const SizedBox(height: 16),
-
-            // Course Grid
-            GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                _buildCourseCard(
-                  context,
-                  'Graphic Design',
-                  'By Kendrick Capusco',
-                  '45%',
-                  Colors.blue,
-                ),
-                _buildCourseCard(
-                  context,
-                  'Wireframing',
-                  'By Shoaib Atto',
-                  '45%',
-                  const Color.fromARGB(255, 180, 41, 134),
-                ),
-                _buildCourseCard(
-                  context,
-                  'Website Design',
-                  'By Dwayne Wade',
-                  '45%',
-                  Colors.orange,
-                ),
-                _buildCourseCard(
-                  context,
-                  'Video Editing',
-                  'By Ammer Cruz',
-                  '45%',
-                  Colors.black,
-                ),
-                _buildCourseCard(
-                  context,
-                  'Cybersecurity',
-                  'By John Anderson',
-                  '45%',
-                  Colors.purple,
-                ),
-                _buildCourseCard(
-                  context,
-                  'MySql Basics',
-                  'By Sarah Johnson',
-                  '45%',
-                  Colors.green,
-                ),
-                _buildCourseCard(
-                  context,
-                  'Flutter Development',
-                  'By Adhz Formentera',
-                  '45%',
-                  Colors.blue,
-                )
-              ],
-            ),
+            _buildCoursesGrid(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCategoryChip(String label, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.grey.shade200 : Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
+  PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      title: Text(
+        'Welcome, $userName',
+        style: const TextStyle(
           color: Colors.black,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          fontSize: 14,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
         ),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.settings_outlined, color: Colors.black),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingsPage(),
+              ),
+            );
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.notifications_outlined, color: Colors.black),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const NotificationsPage(),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategories() {
+    return SizedBox(
+      height: 40,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: const [
+          CategoryChip(label: 'Web', isSelected: true),
+          SizedBox(width: 12),
+          CategoryChip(label: 'Cryptography', isSelected: false),
+          SizedBox(width: 12),
+          CategoryChip(label: 'Figma', isSelected: false),
+        ],
       ),
     );
   }
 
-  Widget _buildCourseCard(
-    BuildContext context,
-    String title,
-    String instructor,
-    String progress,
-    Color accentColor,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CourseDetailsPage(
-              courseTitle: title,
-              instructor: instructor,
-              accentColor: accentColor,
-            ),
+  Widget _buildCoursesHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          'Courses',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
+        ),
+        TextButton(
+          onPressed: () {},
+          child: const Text(
+            'See All',
+            style: TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCoursesGrid(BuildContext context) {
+    // In a real app, this data would come from a provider
+    final courses = [
+      {
+        'title': 'Graphic Design',
+        'instructor': 'By Kendrick Capusco',
+        'progress': '45%',
+        'color': Colors.blue,
+      },
+      {
+        'title': 'Wireframing',
+        'instructor': 'By Shoaib Atto',
+        'progress': '45%',
+        'color': const Color.fromARGB(255, 180, 41, 134),
+      },
+      {
+        'title': 'Website Design',
+        'instructor': 'By Dwayne Wade',
+        'progress': '45%',
+        'color': Colors.orange,
+      },
+      {
+        'title': 'Video Editing',
+        'instructor': 'By Ammer Cruz',
+        'progress': '45%',
+        'color': Colors.black,
+      },
+      {
+        'title': 'Cybersecurity',
+        'instructor': 'By John Anderson',
+        'progress': '45%',
+        'color': Colors.purple,
+      },
+      {
+        'title': 'MySql Basics',
+        'instructor': 'By Sarah Johnson',
+        'progress': '45%',
+        'color': Colors.green,
+      },
+      {
+        'title': 'Flutter Development',
+        'instructor': 'By Adhz Formentera',
+        'progress': '45%',
+        'color': Colors.blue,
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+      ),
+      itemCount: courses.length,
+      itemBuilder: (context, index) {
+        final course = courses[index];
+        return CourseCard(
+          title: course['title'] as String,
+          instructor: course['instructor'] as String,
+          progress: course['progress'] as String,
+          accentColor: course['color'] as Color,
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  color: accentColor.withValues(alpha: 0.15),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    instructor,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      ...List.generate(5, (index) {
-                        return const Icon(Icons.star,
-                            size: 12, color: Colors.blue);
-                      }),
-                      const SizedBox(width: 8),
-                      Text(
-                        progress,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: 0.45,
-                      minHeight: 4,
-                      backgroundColor: Colors.grey.shade300,
-                      valueColor: AlwaysStoppedAnimation<Color>(accentColor),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

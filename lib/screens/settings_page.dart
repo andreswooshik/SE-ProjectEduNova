@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'sign_in_page.dart';
 import 'notifications_page.dart';
 
-class SettingsPage extends StatelessWidget {
-  final String userName;
-
-  const SettingsPage({Key? key, required this.userName}) : super(key: key);
+class SettingsPage extends ConsumerWidget {
+  const SettingsPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

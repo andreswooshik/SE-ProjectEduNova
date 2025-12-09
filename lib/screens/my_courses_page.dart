@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/courses_provider.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/course_card.dart';
 
-class MyCoursesPage extends StatefulWidget {
+class MyCoursesPage extends ConsumerStatefulWidget {
   const MyCoursesPage({Key? key}) : super(key: key);
 
   @override
-  State<MyCoursesPage> createState() => _MyCoursesPageState();
-
-  // Static method to add enrolled course
-  static List<Map<String, dynamic>> enrolledCourses = [];
-
-  static void addEnrolledCourse({
-    required String title,
-    required String instructor,
-    required Color accentColor,
-  }) {
-    bool courseExists =
-        enrolledCourses.any((course) => course['title'] == title);
-
-    if (!courseExists) {
-      enrolledCourses.add({
-        'title': title,
-        'instructor': instructor,
-        'accentColor': accentColor,
-      });
-    }
-  }
+  ConsumerState<MyCoursesPage> createState() => _MyCoursesPageState();
 }
 
-class _MyCoursesPageState extends State<MyCoursesPage> {
+class _MyCoursesPageState extends ConsumerState<MyCoursesPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = ref.read(authProvider).user;
+      if (user != null) {
+        ref.read(coursesProvider.notifier).loadCoursesForStudent(user.id);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final coursesState = ref.watch(coursesProvider);
+    final myCourses = coursesState.myCourses;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -48,139 +46,60 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
           ),
         ),
       ),
-      body: MyCoursesPage.enrolledCourses.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.school_outlined,
-                    size: 80,
-                    color: Colors.grey.shade300,
+      body: coursesState.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : myCourses.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.school_outlined,
+                        size: 80,
+                        color: Colors.grey.shade300,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No Courses Yet',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Enroll in a course to get started',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No Courses Yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Enroll in a course to get started',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  GridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: List.generate(
-                      MyCoursesPage.enrolledCourses.length,
-                      (index) {
-                        var course = MyCoursesPage.enrolledCourses[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(12),
-                                    ),
-                                    color: course['accentColor']
-                                        .withValues(alpha: 0.15),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      course['title'],
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      course['instructor'],
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      children: [
-                                        ...List.generate(5, (i) {
-                                          return const Icon(Icons.star,
-                                              size: 12, color: Colors.blue);
-                                        }),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          '0%',
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(2),
-                                      child: LinearProgressIndicator(
-                                        value: 0.0,
-                                        minHeight: 4,
-                                        backgroundColor: Colors.grey.shade300,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          course['accentColor'],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
                     ),
+                    itemCount: myCourses.length,
+                    itemBuilder: (context, index) {
+                      final course = myCourses[index];
+                      return CourseCard(
+                        title: course.title,
+                        instructor: 'Instructor', // Placeholder
+                        progress: '0%', // Placeholder
+                        accentColor: Colors.blue, // Placeholder
+                      );
+                    },
                   ),
-                ],
-              ),
-            ),
+                ),
     );
   }
 }
