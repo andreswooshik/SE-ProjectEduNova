@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
+import '../models/course.dart';
 import '../widgets/category_chip.dart';
 import '../widgets/course_card.dart';
 import '../widgets/custom_search_bar.dart';
@@ -115,50 +116,77 @@ class StudentDashboardPage extends ConsumerWidget {
   }
 
   Widget _buildCoursesGrid(BuildContext context) {
-    // In a real app, this data would come from a provider
     final courses = [
-      {
-        'title': 'Graphic Design',
-        'instructor': 'By Kendrick Capusco',
-        'progress': '45%',
-        'color': Colors.blue,
-      },
-      {
-        'title': 'Wireframing',
-        'instructor': 'By Shoaib Atto',
-        'progress': '45%',
-        'color': const Color.fromARGB(255, 180, 41, 134),
-      },
-      {
-        'title': 'Website Design',
-        'instructor': 'By Dwayne Wade',
-        'progress': '45%',
-        'color': Colors.orange,
-      },
-      {
-        'title': 'Video Editing',
-        'instructor': 'By Ammer Cruz',
-        'progress': '45%',
-        'color': Colors.black,
-      },
-      {
-        'title': 'Cybersecurity',
-        'instructor': 'By John Anderson',
-        'progress': '45%',
-        'color': Colors.purple,
-      },
-      {
-        'title': 'MySql Basics',
-        'instructor': 'By Sarah Johnson',
-        'progress': '45%',
-        'color': Colors.green,
-      },
-      {
-        'title': 'Flutter Development',
-        'instructor': 'By Adhz Formentera',
-        'progress': '45%',
-        'color': Colors.blue,
-      },
+      Course(
+        id: '1',
+        title: 'Graphic Design',
+        description: 'Learn the fundamentals of graphic design',
+        teacherId: 'teacher_1',
+        instructor: 'By Kendrick Capusco',
+        progress: '45%',
+        accentColor: Colors.blue,
+        thumbnailAsset: 'assets/images/graphDesign.png',
+      ),
+      Course(
+        id: '2',
+        title: 'Wireframing',
+        description: 'Master wireframing techniques',
+        teacherId: 'teacher_2',
+        instructor: 'By Shoaib Atto',
+        progress: '45%',
+        accentColor: const Color.fromARGB(255, 180, 41, 134),
+        thumbnailAsset: 'assets/images/wireframe.png',
+      ),
+      Course(
+        id: '3',
+        title: 'Website Design',
+        description: 'Create beautiful websites',
+        teacherId: 'teacher_3',
+        instructor: 'By Dwayne Wade',
+        progress: '45%',
+        accentColor: Colors.orange,
+        thumbnailAsset: 'assets/images/webDesign.png',
+      ),
+      Course(
+        id: '4',
+        title: 'Video Editing',
+        description: 'Professional video editing skills',
+        teacherId: 'teacher_4',
+        instructor: 'By Ammer Cruz',
+        progress: '45%',
+        accentColor: Colors.black,
+        thumbnailAsset: 'assets/images/VideoEditing.png',
+      ),
+      Course(
+        id: '5',
+        title: 'Cybersecurity',
+        description: 'Secure systems and networks',
+        teacherId: 'teacher_5',
+        instructor: 'By John Anderson',
+        progress: '45%',
+        accentColor: Colors.purple,
+        thumbnailAsset: 'assets/images/cybersec.png',
+      ),
+      Course(
+        id: '6',
+        title: 'MySql Basics',
+        description: 'Database fundamentals',
+        teacherId: 'teacher_6',
+        instructor: 'By Sarah Johnson',
+        progress: '45%',
+        accentColor: Colors.green,
+        thumbnailAsset: 'assets/images/sql.png',
+      ),
+      Course(
+        id: '7',
+        title: 'Flutter Development',
+        description: 'Build mobile apps with Flutter',
+        teacherId: 'teacher_7',
+        instructor: 'By Adhz Formentera',
+        progress: '45%',
+        accentColor: Colors.blue,
+        thumbnailAsset: 'assets/images/flutter.jpg',
+      ),
     ];
 
     return GridView.builder(
@@ -168,15 +196,18 @@ class StudentDashboardPage extends ConsumerWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
+        childAspectRatio: 0.75,
       ),
       itemCount: courses.length,
       itemBuilder: (context, index) {
         final course = courses[index];
         return CourseCard(
-          title: course['title'] as String,
-          instructor: course['instructor'] as String,
-          progress: course['progress'] as String,
-          accentColor: course['color'] as Color,
+          title: course.title,
+          instructor: course.instructor ?? 'Unknown Instructor',
+          progress: course.progress ?? '0%',
+          accentColor: course.accentColor ?? Colors.grey,
+          assetImage: course.thumbnailAsset,
+          imageUrl: course.thumbnailUrl,
         );
       },
     );

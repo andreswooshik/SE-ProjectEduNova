@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Course model following Single Responsibility Principle
 /// This class only represents course data
 class Course {
@@ -11,6 +13,13 @@ class Course {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  // New fields for UI display
+  final String? thumbnailUrl;
+  final String? thumbnailAsset;
+  final Color? accentColor;
+  final String? instructor;
+  final String? progress;
+
   Course({
     required this.id,
     required this.title,
@@ -21,6 +30,11 @@ class Course {
     List<Assignment>? assignments,
     DateTime? createdAt,
     this.updatedAt,
+    this.thumbnailUrl,
+    this.thumbnailAsset,
+    this.accentColor,
+    this.instructor,
+    this.progress,
   })  : enrolledStudentIds = enrolledStudentIds ?? [],
         materials = materials ?? [],
         assignments = assignments ?? [],
@@ -37,6 +51,11 @@ class Course {
       'assignments': assignments.map((a) => a.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'thumbnailUrl': thumbnailUrl,
+      'thumbnailAsset': thumbnailAsset,
+      'accentColor': accentColor?.value,
+      'instructor': instructor,
+      'progress': progress,
     };
   }
 
@@ -59,6 +78,13 @@ class Course {
       updatedAt: json['updatedAt'] != null
           ? DateTime.tryParse(json['updatedAt'])
           : null,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      thumbnailAsset: json['thumbnailAsset'] as String?,
+      accentColor: json['accentColor'] != null
+          ? Color(json['accentColor'] as int)
+          : null,
+      instructor: json['instructor'] as String?,
+      progress: json['progress'] as String?,
     );
   }
 
@@ -72,6 +98,11 @@ class Course {
     List<Assignment>? assignments,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? thumbnailUrl,
+    String? thumbnailAsset,
+    Color? accentColor,
+    String? instructor,
+    String? progress,
   }) {
     return Course(
       id: id ?? this.id,
@@ -83,6 +114,11 @@ class Course {
       assignments: assignments ?? this.assignments,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      thumbnailAsset: thumbnailAsset ?? this.thumbnailAsset,
+      accentColor: accentColor ?? this.accentColor,
+      instructor: instructor ?? this.instructor,
+      progress: progress ?? this.progress,
     );
   }
 
