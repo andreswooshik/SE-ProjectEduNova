@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../models/assignment.dart';
 
 class AssignmentDetailsPage extends StatelessWidget {
@@ -9,6 +8,24 @@ class AssignmentDetailsPage extends StatelessWidget {
     Key? key,
     required this.assignment,
   }) : super(key: key);
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +46,6 @@ class AssignmentDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Assignment Title
             Text(
               assignment.title,
               style: const TextStyle(
@@ -39,8 +55,6 @@ class AssignmentDetailsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-
-            // Course Name
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -57,16 +71,13 @@ class AssignmentDetailsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Info Cards
             Row(
               children: [
                 Expanded(
                   child: _buildInfoCard(
                     icon: Icons.calendar_today,
                     label: 'Due Date',
-                    value:
-                        DateFormat('MMM dd, yyyy').format(assignment.dueDate),
+                    value: _formatDate(assignment.dueDate),
                     color: Colors.orange,
                   ),
                 ),
@@ -82,12 +93,8 @@ class AssignmentDetailsPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-
-            // Status Card
             _buildStatusCard(),
             const SizedBox(height: 24),
-
-            // Description Section
             const Text(
               'Description',
               style: TextStyle(
@@ -114,8 +121,6 @@ class AssignmentDetailsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Instructions Section
             const Text(
               'Instructions',
               style: TextStyle(
@@ -130,8 +135,6 @@ class AssignmentDetailsPage extends StatelessWidget {
             _buildInstructionItem('3. Submit before the deadline'),
             _buildInstructionItem('4. Ensure all requirements are met'),
             const SizedBox(height: 32),
-
-            // Submit Button
             SizedBox(
               width: double.infinity,
               height: 56,
