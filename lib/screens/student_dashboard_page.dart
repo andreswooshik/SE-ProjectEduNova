@@ -1,18 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
-import '../models/course.dart';
+import '../providers/courses_provider.dart';
+import '../providers/search_provider.dart';
 import '../widgets/category_chip.dart';
 import '../widgets/course_card.dart';
 import '../widgets/custom_search_bar.dart';
 import 'settings_page.dart';
 import 'notifications_page.dart';
 
-class StudentDashboardPage extends ConsumerWidget {
+/// Student Dashboard following SOLID principles
+class StudentDashboardPage extends ConsumerStatefulWidget {
   const StudentDashboardPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StudentDashboardPage> createState() =>
+      _StudentDashboardPageState();
+}
+
+class _StudentDashboardPageState extends ConsumerState<StudentDashboardPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Load all courses when dashboard opens
+    Future.microtask(() {
+      ref.read(coursesProvider.notifier).loadAllCourses();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final userName = authState.user?.firstName ?? 'Student';
 
@@ -30,7 +47,7 @@ class StudentDashboardPage extends ConsumerWidget {
             const SizedBox(height: 24),
             _buildCoursesHeader(),
             const SizedBox(height: 16),
-            _buildCoursesGrid(context),
+            _buildCoursesGrid(),
           ],
         ),
       ),
@@ -41,7 +58,7 @@ class StudentDashboardPage extends ConsumerWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      automaticallyImplyLeading: false, // Remove back button
+      automaticallyImplyLeading: false,
       title: Text(
         'Welcome, $userName',
         style: const TextStyle(
@@ -94,16 +111,32 @@ class StudentDashboardPage extends ConsumerWidget {
   }
 
   Widget _buildCoursesHeader() {
+    final filteredCourses = ref.watch(filteredCoursesProvider);
+    final searchQuery = ref.watch(searchProvider);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Courses',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Courses',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            if (searchQuery.isNotEmpty)
+              Text(
+                '${filteredCourses.length} result${filteredCourses.length != 1 ? 's' : ''} found',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+          ],
         ),
         TextButton(
           onPressed: () {},
@@ -116,80 +149,74 @@ class StudentDashboardPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCoursesGrid(BuildContext context) {
-    final courses = [
-      Course(
-        id: '1',
-        title: 'Graphic Design',
-        description: 'Learn the fundamentals of graphic design',
-        teacherId: 'teacher_1',
-        instructor: 'Kendrick Capusco',
-        progress: '45%',
-        accentColor: Colors.blue,
-        thumbnailAsset: 'assets/images/graphDesign.png',
-      ),
-      Course(
-        id: '2',
-        title: 'Wireframing',
-        description: 'Master wireframing techniques',
-        teacherId: 'teacher_2',
-        instructor: 'Shoaib Atto',
-        progress: '45%',
-        accentColor: const Color.fromARGB(255, 180, 41, 134),
-        thumbnailAsset: 'assets/images/wireframe.png',
-      ),
-      Course(
-        id: '3',
-        title: 'Website Design',
-        description: 'Create beautiful websites',
-        teacherId: 'teacher_3',
-        instructor: 'Dwayne Wade',
-        progress: '45%',
-        accentColor: Colors.orange,
-        thumbnailAsset: 'assets/images/webDesign.png',
-      ),
-      Course(
-        id: '4',
-        title: 'Video Editing',
-        description: 'Professional video editing skills',
-        teacherId: 'teacher_4',
-        instructor: 'Ammer Cruz',
-        progress: '45%',
-        accentColor: Colors.black,
-        thumbnailAsset: 'assets/images/VideoEditing.png',
-      ),
-      Course(
-        id: '5',
-        title: 'Cybersecurity',
-        description: 'Secure systems and networks',
-        teacherId: 'teacher_5',
-        instructor: 'John Anderson',
-        progress: '45%',
-        accentColor: Colors.purple,
-        thumbnailAsset: 'assets/images/cybersec.png',
-      ),
-      Course(
-        id: '6',
-        title: 'MySql Basics',
-        description: 'Database fundamentals',
-        teacherId: 'teacher_6',
-        instructor: 'Sarah Johnson',
-        progress: '45%',
-        accentColor: Colors.green,
-        thumbnailAsset: 'assets/images/sql.png',
-      ),
-      Course(
-        id: '7',
-        title: 'Flutter Development',
-        description: 'Build mobile apps with Flutter',
-        teacherId: 'teacher_7',
-        instructor: 'Adhz Formentera',
-        progress: '45%',
-        accentColor: Colors.blue,
-        thumbnailAsset: 'assets/images/flutter.jpg',
-      ),
-    ];
+  Widget _buildCoursesGrid() {
+    final coursesState = ref.watch(coursesProvider);
+    final filteredCourses = ref.watch(filteredCoursesProvider);
+    final searchQuery = ref.watch(searchProvider);
 
+    // Show loading indicator
+    if (coursesState.isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Show error message
+    if (coursesState.errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 80,
+                color: Colors.red.shade300,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Error loading courses',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                coursesState.errorMessage!,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  ref.read(coursesProvider.notifier).loadAllCourses();
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF003366),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show empty state
+    if (filteredCourses.isEmpty) {
+      return _buildEmptyState(searchQuery);
+    }
+
+    // Show courses grid
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -199,10 +226,47 @@ class StudentDashboardPage extends ConsumerWidget {
         crossAxisSpacing: 16,
         childAspectRatio: 0.75,
       ),
-      itemCount: courses.length,
+      itemCount: filteredCourses.length,
       itemBuilder: (context, index) {
-        return CourseCard(course: courses[index]);
+        return CourseCard(course: filteredCourses[index]);
       },
+    );
+  }
+
+  Widget _buildEmptyState(String searchQuery) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 80,
+              color: Colors.grey.shade300,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No courses found',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              searchQuery.isNotEmpty
+                  ? 'No results for "$searchQuery"'
+                  : 'Try searching for a different course',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
