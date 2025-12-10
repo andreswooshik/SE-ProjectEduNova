@@ -2,19 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/course.dart';
 import '../providers/enrollment_provider.dart';
-import 'enrolled_course_details_page.dart';
 
-/// Course details page that displays comprehensive information about a course
-/// and allows students to enroll.
-/// 
-/// This widget follows the Single Responsibility Principle by focusing solely
-/// on displaying course details and handling enrollment actions.
-/// 
-/// IMPORTANT: This page uses course.id for enrollment operations, NOT course.title.
-/// This ensures accurate course identification even when multiple courses have
-/// similar titles.
 class CourseDetailsPage extends ConsumerStatefulWidget {
-  /// The complete course object containing all course information including the unique ID
   final Course course;
 
   const CourseDetailsPage({
@@ -31,6 +20,9 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isEnrolled =
+        ref.watch(enrollmentProvider.notifier).isEnrolled(widget.course.id);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -51,7 +43,6 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Course Image
             Container(
               height: 200,
               width: double.infinity,
@@ -62,9 +53,15 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                       errorBuilder: (context, error, stackTrace) =>
                           _buildPlaceholder(),
                     )
-                  : _buildPlaceholder(),
+                  : widget.course.thumbnailUrl != null
+                      ? Image.network(
+                          widget.course.thumbnailUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildPlaceholder(),
+                        )
+                      : _buildPlaceholder(),
             ),
-
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -78,7 +75,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  if (_selectedIndex == 0) _buildOverviewTab(),
+                  if (_selectedIndex == 0) _buildOverviewTab(isEnrolled),
                   if (_selectedIndex == 1) _buildLessonsTab(),
                   if (_selectedIndex == 2) _buildReviewsTab(),
                 ],
@@ -130,13 +127,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
     );
   }
 
-  Widget _buildOverviewTab() {
-    // Check enrollment status using course.id for accurate identification
-    // Using course.id instead of course.title prevents issues with duplicate
-    // or similar course names
-    final isEnrolled =
-        ref.watch(enrollmentProvider.notifier).isEnrolled(widget.course.id);
-
+  Widget _buildOverviewTab(bool isEnrolled) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -182,31 +173,30 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
             children: [
               Expanded(
                 child: Column(
-                  children: [
-                    const Icon(Icons.play_lesson, color: Colors.blue, size: 32),
-                    const SizedBox(height: 8),
-                    const Text('80+ Lectures',
+                  children: const [
+                    Icon(Icons.play_lesson, color: Colors.blue, size: 32),
+                    SizedBox(height: 8),
+                    Text('80+ Lectures',
                         style: TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
               Expanded(
                 child: Column(
-                  children: [
-                    const Icon(Icons.card_membership,
-                        color: Colors.blue, size: 32),
-                    const SizedBox(height: 8),
-                    const Text('Certificate',
+                  children: const [
+                    Icon(Icons.card_membership, color: Colors.blue, size: 32),
+                    SizedBox(height: 8),
+                    Text('Certificate',
                         style: TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
               Expanded(
                 child: Column(
-                  children: [
-                    const Icon(Icons.schedule, color: Colors.blue, size: 32),
-                    const SizedBox(height: 8),
-                    const Text('8 Weeks',
+                  children: const [
+                    Icon(Icons.schedule, color: Colors.blue, size: 32),
+                    SizedBox(height: 8),
+                    Text('8 Weeks',
                         style: TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
@@ -259,20 +249,8 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
     );
   }
 
-  /// Handles the enrollment action when the user taps the enroll button.
-  /// 
-  /// This method:
-  /// 1. Checks enrollment status using the unique course.id
-  /// 2. Prevents duplicate enrollments
-  /// 3. Enrolls the complete course object (not just ID) to maintain full course data
-  /// 4. Provides user feedback via SnackBar
-  /// 5. Navigates to EnrolledCourseDetailsPage after successful enrollment
-  /// 
-  /// CRITICAL: Always uses course.id for enrollment operations to ensure
-  /// correct course identification.
   void _handleEnrollment() {
     final enrollmentNotifier = ref.read(enrollmentProvider.notifier);
-    // Check if already enrolled using course.id (unique identifier)
     final isEnrolled = enrollmentNotifier.isEnrolled(widget.course.id);
 
     if (isEnrolled) {
@@ -283,44 +261,242 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
         ),
       );
     } else {
-      // Enroll the complete course object to preserve all course data
-      // The enrollmentProvider will use course.id internally for deduplication
       enrollmentNotifier.enrollCourse(widget.course);
-      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Successfully enrolled!'),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 1),
         ),
       );
-      
-      // Navigate to enrolled course details screen after successful enrollment
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EnrolledCourseDetailsPage(
-                courseTitle: widget.course.title,
-                instructor: widget.course.instructor ?? 'Unknown Instructor',
-                accentColor: widget.course.accentColor ?? Colors.blue,
-              ),
-            ),
-          );
-        }
-      });
+      setState(() {});
     }
   }
 
   Widget _buildLessonsTab() {
-    // ...existing code...
-    return Container(); // Placeholder
+    return StatefulBuilder(
+      builder: (context, setState) {
+        List<Map<String, dynamic>> chapters = [
+          {
+            'title': 'Chapter 1 : What is Graphics Designing?',
+            'isExpanded': true,
+            'lessons': [
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.description,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.description,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+            ]
+          },
+          {
+            'title': 'Chapter 2 : What is Logo Designing?',
+            'isExpanded': false,
+            'lessons': [
+              {
+                'icon': Icons.play_circle,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+              {
+                'icon': Icons.description,
+                'text': 'Lorem ipsum dolor sit amet consectetur.'
+              },
+            ]
+          },
+        ];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: chapters.length,
+              itemBuilder: (context, chapterIndex) {
+                return Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          chapters[chapterIndex]['isExpanded'] =
+                              !chapters[chapterIndex]['isExpanded'];
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                chapters[chapterIndex]['title'],
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              chapters[chapterIndex]['isExpanded']
+                                  ? Icons.expand_less
+                                  : Icons.expand_more,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (chapters[chapterIndex]['isExpanded'])
+                      ...List.generate(
+                        chapters[chapterIndex]['lessons'].length,
+                        (lessonIndex) {
+                          var lesson =
+                              chapters[chapterIndex]['lessons'][lessonIndex];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withValues(alpha: 0.08),
+                              border: Border.all(
+                                  color: Colors.blue.withValues(alpha: 0.2)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  lesson['icon'],
+                                  color: Colors.blue,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    lesson['text'],
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    const SizedBox(height: 16),
+                  ],
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildReviewsTab() {
-    // ...existing code...
-    return Container(); // Placeholder
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 3,
+          itemBuilder: (context, index) {
+            List<String> reviewerNames = [
+              'Brendan Lumicday',
+              'Reiner Dela Cerna',
+              'Andres Ebuna',
+            ];
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: Colors.grey.shade300,
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                reviewerNames[index],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Student',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: List.generate(5, (starIndex) {
+                          return const Icon(
+                            Icons.star,
+                            size: 16,
+                            color: Colors.blue,
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Lorem ipsum dolor sit amet consectetur. Euismod turpis tortor sollicitudin et.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.black87,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 
   Widget _buildSkillChip(String skill) {

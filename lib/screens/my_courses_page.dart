@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/enrollment_provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/course_card.dart';
+import 'enrolled_course_details_page.dart';
 
 class MyCoursesPage extends ConsumerWidget {
   const MyCoursesPage({Key? key}) : super(key: key);
@@ -106,7 +107,22 @@ class MyCoursesPage extends ConsumerWidget {
                       final course = enrolledCourses[index];
                       return CourseCard(
                         course: course,
-                        isEnrolled: true, // Mark as enrolled to navigate to EnrolledCourseDetailsPage
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EnrolledCourseDetailsPage(
+                                courseId: course.id,
+                                courseTitle: course.title,
+                                instructor:
+                                    course.instructor ?? 'Unknown Instructor',
+                                accentColor: course.accentColor ?? Colors.blue,
+                                thumbnailAsset: course.thumbnailAsset,
+                                thumbnailUrl: course.thumbnailUrl,
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

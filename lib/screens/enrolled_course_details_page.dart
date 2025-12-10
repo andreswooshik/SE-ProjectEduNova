@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'announcements_page.dart';
 import 'modules_page.dart';
+import 'assignment_quiz_page.dart';
 
 class EnrolledCourseDetailsPage extends StatefulWidget {
+  final String courseId;
   final String courseTitle;
   final String instructor;
   final Color accentColor;
+  final String? thumbnailAsset;
+  final String? thumbnailUrl;
 
   const EnrolledCourseDetailsPage({
     Key? key,
+    required this.courseId,
     required this.courseTitle,
     required this.instructor,
     required this.accentColor,
+    this.thumbnailAsset,
+    this.thumbnailUrl,
   }) : super(key: key);
 
   @override
@@ -40,16 +47,21 @@ class _EnrolledCourseDetailsPageState extends State<EnrolledCourseDetailsPage> {
             Container(
               height: 200,
               width: double.infinity,
-              decoration: BoxDecoration(
-                color: widget.accentColor.withValues(alpha: 0.15),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.lock,
-                  size: 80,
-                  color: widget.accentColor,
-                ),
-              ),
+              child: widget.thumbnailAsset != null
+                  ? Image.asset(
+                      widget.thumbnailAsset!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildPlaceholder(),
+                    )
+                  : widget.thumbnailUrl != null
+                      ? Image.network(
+                          widget.thumbnailUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildPlaceholder(),
+                        )
+                      : _buildPlaceholder(),
             ),
 
             Padding(
@@ -88,7 +100,7 @@ class _EnrolledCourseDetailsPageState extends State<EnrolledCourseDetailsPage> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(
+                  const Text(
                     'Read More',
                     style: TextStyle(
                       fontSize: 13,
@@ -139,7 +151,16 @@ class _EnrolledCourseDetailsPageState extends State<EnrolledCourseDetailsPage> {
                     icon: Icons.assignment_outlined,
                     label: 'Assignments / Quizzes',
                     onTap: () {
-                      // Navigate to Assignments
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AssignmentsQuizzesPage(
+                            courseId: widget.courseId,
+                            courseName: widget.courseTitle,
+                            courseImage: widget.thumbnailAsset,
+                          ),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -149,13 +170,31 @@ class _EnrolledCourseDetailsPageState extends State<EnrolledCourseDetailsPage> {
                     icon: Icons.download_outlined,
                     label: 'Downloads',
                     onTap: () {
-                      // Navigate to Downloads
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Downloads feature coming soon!'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
                     },
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      color: widget.accentColor.withValues(alpha: 0.15),
+      child: Center(
+        child: Icon(
+          Icons.school,
+          size: 80,
+          color: widget.accentColor.withValues(alpha: 0.5),
         ),
       ),
     );
@@ -195,7 +234,7 @@ class _EnrolledCourseDetailsPageState extends State<EnrolledCourseDetailsPage> {
                 ),
               ],
             ),
-            Icon(
+            const Icon(
               Icons.arrow_forward_ios,
               color: Colors.grey,
               size: 18,
