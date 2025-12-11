@@ -14,7 +14,8 @@ class TeacherCourseDetailPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<TeacherCourseDetailPage> createState() => _TeacherCourseDetailPageState();
+  State<TeacherCourseDetailPage> createState() =>
+      _TeacherCourseDetailPageState();
 }
 
 class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage>
@@ -310,24 +311,9 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage>
     );
   }
 
-  Widget _buildInfoItemAlt({required IconData icon, required String text}) {
-    return Column(
-      children: [
-        Icon(icon, color: Theme.of(context).primaryColor, size: 28),
-        const SizedBox(height: 4),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildSkillsChips() {
-    final skills = CourseContentProvider.getSkillsForCourse(widget.course.title);
+    final skills =
+        CourseContentProvider.getSkillsForCourse(widget.course.title);
 
     return Wrap(
       spacing: 8,
@@ -346,7 +332,8 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage>
   }
 
   Widget _buildLessonsTab() {
-    final chapters = CourseContentProvider.getChaptersForCourse(widget.course.title);
+    final chapters =
+        CourseContentProvider.getChaptersForCourse(widget.course.title);
 
     return ListView(
       padding: const EdgeInsets.all(20),

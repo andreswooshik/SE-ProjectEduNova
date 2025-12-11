@@ -26,6 +26,9 @@ dependencies:
   
   # MIME type detection
   mime: ^1.0.5
+  
+  # Database
+  sqflite: ^2.3.0
 
 dev_dependencies:
   flutter_test:

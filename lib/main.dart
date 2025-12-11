@@ -2,13 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'screens/welcome_page.dart';
+import 'services/database_initializer.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize database with default data
+  print('🔷 Starting database initialization...');
+  await DatabaseInitializer.initializeDefaultData();
+  print('✅ Database initialization complete!');
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
   // Wrap the app with ProviderScope for Riverpod state management
   runApp(const ProviderScope(child: EduNovaApp()));
 }

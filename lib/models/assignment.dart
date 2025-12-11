@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// Assignment model representing a course assignment
 class Assignment {
   final String id;

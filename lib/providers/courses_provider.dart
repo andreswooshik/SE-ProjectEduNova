@@ -285,7 +285,7 @@ final filteredCoursesProvider = Provider<List<Course>>((ref) {
     final instructorMatch =
         course.instructor?.toLowerCase().contains(searchQuery) ?? false;
     final descriptionMatch =
-        course.description?.toLowerCase().contains(searchQuery) ?? false;
+        course.description.toLowerCase().contains(searchQuery);
 
     return titleMatch || instructorMatch || descriptionMatch;
   }).toList();

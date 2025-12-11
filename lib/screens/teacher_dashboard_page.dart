@@ -4,7 +4,6 @@ import '../providers/auth_provider.dart';
 import '../core/constants/app_constants.dart';
 import '../models/user.dart';
 import '../models/course.dart';
-import '../models/course_analytics.dart';
 import '../services/course_service.dart';
 import '../widgets/course_analytics_widgets.dart';
 import 'settings_page.dart';
@@ -18,11 +17,18 @@ class TeacherDashboardPage extends ConsumerStatefulWidget {
   const TeacherDashboardPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<TeacherDashboardPage> createState() => _TeacherDashboardPageState();
+  ConsumerState<TeacherDashboardPage> createState() =>
+      _TeacherDashboardPageState();
 }
 
 class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
-  final List<String> categories = ['All', 'Web', 'Cryptography', 'Design', 'Video'];
+  final List<String> categories = [
+    'All',
+    'Web',
+    'Cryptography',
+    'Design',
+    'Video'
+  ];
   String selectedCategory = 'All';
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -45,25 +51,31 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
 
   List<Course> get _filteredCourses {
     var courses = List<Course>.from(teacherCourses);
-    
+
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
       courses = courses.where((course) {
-        return course.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            course.description.toLowerCase().contains(_searchQuery.toLowerCase());
+        return course.title
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()) ||
+            course.description
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase());
       }).toList();
     }
-    
+
     // Apply category filter
     if (selectedCategory != 'All') {
       courses = courses.where((course) {
-        return course.title.toLowerCase().contains(selectedCategory.toLowerCase());
+        return course.title
+            .toLowerCase()
+            .contains(selectedCategory.toLowerCase());
       }).toList();
     }
-    
+
     // Apply sorting
     courses = _courseService.sortCourses(courses, _sortOption);
-    
+
     return courses;
   }
 
@@ -72,7 +84,8 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
     Course(
       id: '1',
       title: 'Graphic Design',
-      description: 'Learn the fundamentals of graphic design including typography, color theory, and layout principles.',
+      description:
+          'Learn the fundamentals of graphic design including typography, color theory, and layout principles.',
       teacherId: 'teacher1',
       instructor: 'By Kenneth Coppock',
       progress: '45% Done',
@@ -82,7 +95,8 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
     Course(
       id: '2',
       title: 'Wireframing',
-      description: 'Master the art of wireframing and prototyping for web and mobile applications.',
+      description:
+          'Master the art of wireframing and prototyping for web and mobile applications.',
       teacherId: 'teacher1',
       instructor: 'By Shivalo Alo',
       progress: '45% Done',
@@ -92,7 +106,8 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
     Course(
       id: '3',
       title: 'Website Design',
-      description: 'Complete guide to modern website design with hands-on projects.',
+      description:
+          'Complete guide to modern website design with hands-on projects.',
       teacherId: 'teacher1',
       instructor: 'By Dwayne Wade',
       progress: '45% Done',
@@ -112,7 +127,8 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
     Course(
       id: '5',
       title: 'Cybersecurity',
-      description: 'Comprehensive cybersecurity fundamentals covering threat analysis, network security, and best practices.',
+      description:
+          'Comprehensive cybersecurity fundamentals covering threat analysis, network security, and best practices.',
       teacherId: 'teacher1',
       instructor: 'By Syed Hasnain',
       progress: '45% Done',
@@ -455,7 +471,7 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
 
   Widget _buildCoursesGrid() {
     final courses = _filteredCourses;
-    
+
     if (courses.isEmpty) {
       return Center(
         child: Padding(
@@ -477,7 +493,7 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
         ),
       );
     }
-    
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -539,7 +555,8 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
               Container(
                 height: 120,
                 decoration: BoxDecoration(
-                  color: course.accentColor?.withOpacity(0.1) ?? Colors.grey[200],
+                  color:
+                      course.accentColor?.withOpacity(0.1) ?? Colors.grey[200],
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
                   ),
@@ -789,7 +806,8 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  child: const Text('Close', style: TextStyle(color: Colors.white)),
+                  child: const Text('Close',
+                      style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
@@ -804,11 +822,13 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
       return Icons.brush;
     } else if (title.toLowerCase().contains('video')) {
       return Icons.videocam;
-    } else if (title.toLowerCase().contains('website') || title.toLowerCase().contains('web')) {
+    } else if (title.toLowerCase().contains('website') ||
+        title.toLowerCase().contains('web')) {
       return Icons.web;
     } else if (title.toLowerCase().contains('wireframe')) {
       return Icons.dashboard_customize;
-    } else if (title.toLowerCase().contains('cybersecurity') || title.toLowerCase().contains('security')) {
+    } else if (title.toLowerCase().contains('cybersecurity') ||
+        title.toLowerCase().contains('security')) {
       return Icons.security;
     }
     return Icons.school;

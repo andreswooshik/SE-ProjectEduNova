@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// Course Analytics Model
 /// Single Responsibility: Represents analytics data for a course
 class CourseAnalytics {

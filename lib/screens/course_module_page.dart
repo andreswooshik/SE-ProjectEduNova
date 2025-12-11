@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/module.dart';
 import 'module_resource_detail_page.dart';
 
 /// Course Module Page - Shows all modules and their resources
@@ -37,7 +36,10 @@ class CourseModulePage extends StatelessWidget {
         'resources': [
           {'title': 'OSI Model & TCP/IP Overview', 'type': 'pdf'},
           {'title': 'IP Addressing & Ports', 'type': 'pdf'},
-          {'title': 'Common Network Protocols (HTTP, DNS, FTP, SSH)', 'type': 'pdf'},
+          {
+            'title': 'Common Network Protocols (HTTP, DNS, FTP, SSH)',
+            'type': 'pdf'
+          },
           {'title': 'How Hackers Exploit Networks', 'type': 'video'},
         ],
       },
@@ -56,7 +58,9 @@ class CourseModulePage extends StatelessWidget {
                   children: [
                     _buildCourseInfo(),
                     const SizedBox(height: 24),
-                    ...modules.map((module) => _buildModuleCard(context, module)).toList(),
+                    ...modules
+                        .map((module) => _buildModuleCard(context, module))
+                        .toList(),
                   ],
                 ),
               ),
@@ -154,7 +158,7 @@ class CourseModulePage extends StatelessWidget {
 
   Widget _buildModuleCard(BuildContext context, Map<String, dynamic> module) {
     final resources = module['resources'] as List<Map<String, String>>;
-    
+
     return Container(
       margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       decoration: BoxDecoration(
@@ -177,7 +181,8 @@ class CourseModulePage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.grey[50],
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
             ),
             child: Row(
               children: [
@@ -226,7 +231,8 @@ class CourseModulePage extends StatelessWidget {
     );
   }
 
-  Widget _buildResourceItem(BuildContext context, Map<String, String> resource) {
+  Widget _buildResourceItem(
+      BuildContext context, Map<String, String> resource) {
     final type = resource['type']!;
     IconData icon;
     Color iconColor;

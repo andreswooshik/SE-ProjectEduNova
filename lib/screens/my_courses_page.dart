@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/enrollment_provider.dart';
-import '../providers/auth_provider.dart';
 import '../widgets/course_card.dart';
 import 'enrolled_course_details_page.dart';
 
@@ -11,7 +10,6 @@ class MyCoursesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final enrolledCourses = ref.watch(enrollmentProvider);
-    final user = ref.watch(authProvider).user;
 
     return Scaffold(
       backgroundColor: Colors.white,
