@@ -68,13 +68,13 @@ User user = User.fromJson(jsonDecode(jsonString));
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   PRESENTATION LAYER                     │
+│                   PRESENTATION LAYER                    │
 │  (Screens, Widgets, Providers - User Interface)         │
 ├─────────────────────────────────────────────────────────┤
-│                   DOMAIN LAYER                           │
+│                   DOMAIN LAYER                          │
 │  (Models, Use Cases, Business Logic)                    │
 ├─────────────────────────────────────────────────────────┤
-│                   DATA LAYER                             │
+│                   DATA LAYER                            │
 │  (Repositories, Storage Services, Data Sources)         │
 └─────────────────────────────────────────────────────────┘
 ```
